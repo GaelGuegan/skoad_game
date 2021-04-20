@@ -33,12 +33,12 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    this.load.image('background', '/assets/mont_saint_michel.png');
-    this.load.image('ground', '/assets/ground.png');
-    this.load.image('obstacle', '/assets/obstacle.png');
-    this.load.spritesheet('dude', '/assets/skoad_man.png', { frameWidth: 32, frameHeight: 50 });
-    this.load.spritesheet('bird', '/assets/bird.png', { frameWidth: 39, frameHeight: 28 });
-    this.load.audio('eye_music', '/assets/skoad_music.wav');
+    this.load.image('background', 'assets/mont_saint_michel.png');
+    this.load.image('ground', 'assets/ground.png');
+    this.load.image('obstacle', 'assets/obstacle.png');
+    this.load.spritesheet('dude', 'assets/skoad_man.png', { frameWidth: 32, frameHeight: 50 });
+    this.load.spritesheet('bird', 'assets/bird.png', { frameWidth: 39, frameHeight: 28 });
+    this.load.audio('eye_music', 'assets/skoad_music.wav');
 }
 
 function create ()
