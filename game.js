@@ -5,7 +5,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 900 },
+            gravity: { y: 981 },
             debug: false
         }
     },
@@ -21,10 +21,13 @@ var player;
 var stars;
 var bombs;
 var platforms;
+var obstacles;
 var cursors;
 var score = 0;
 var gameOver = false;
 var scoreText;
+
+var xp = 0;
 
 var game = new Phaser.Game(config);
 
@@ -32,24 +35,50 @@ function preload ()
 {
     this.load.image('background', '/assets/mont_saint_michel.png');
     this.load.image('ground', '/assets/ground.png');
-    this.load.image('star', '/assets/star.png');
-    this.load.image('bomb', '/assets/bomb.png');
+    this.load.image('obstacle', '/assets/obstacle.png');
     this.load.spritesheet('dude', '/assets/skoad_man.png', { frameWidth: 32, frameHeight: 50 });
+    this.load.spritesheet('bird', '/assets/bird.png', { frameWidth: 39, frameHeight: 28 });
     this.load.audio('eye_music', ['/assets/skoad_music.wav']);
 }
 
 function create ()
 {
-    var eye_music = this.sound.add('eye_music');
-    eye_music.play({loop: true});
+    var music = this.sound.add('eye_music');
+    music.play({loop: true});
 
     var bg = this.add.image(0, 0, 'background');
     bg.setOrigin(0, 0);
     bg.setDisplaySize(config.width, config.height-20);
 
-    platforms = this.physics.add.staticImage(config.width/2, config.height-15, 'ground');
+    //platforms = this.physics.add.staticImage(config.width/2, config.height-15, 'ground');
+    //platforms = this.physics.add.image(config.width/2, config.height-15, 'ground');
+    //platforms.setCollideWorldBounds(true);
 
-    player = this.physics.add.sprite(20, 100, 'dude');
+    ground = this.add.tileSprite(config.width/2, config.height-15, 0, 0, 'ground');
+    //this.arcade.add.gameObject(ground);
+    //ground.body.setCollideWorldBounds(true);
+    //game.physics.arcade.enable([ground]);
+    this.physics.add.existing(ground, false);
+    ground.body.setCollideWorldBounds(true);
+
+    var bird = this.add.sprite(300, 100, 'bird');
+    bird.setScale(2);
+    this.anims.create({
+        key: 'bleft',
+        frames: this.anims.generateFrameNumbers('bird', { start: 0, end: 4 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    bird.anims.play('bleft', true);
+
+    /*obstacles = this.physics.add.group();
+    obstacle = obstacles.create(700, 300, 'obstacle');
+    obstacle.setCollideWorldBounds(true);
+    obstacle.setVelocity(-80);
+    this.physics.add.collider(obstacle, platforms);*/
+
+    player = this.physics.add.sprite(100, 100, 'dude');
     player.setScale(2);
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
@@ -76,25 +105,14 @@ function create ()
         frameRate: 10,
         repeat: -1
     });
+    player.anims.play('right', true);
 
     cursors = this.input.keyboard.createCursorKeys();
-    stars = this.physics.add.group({
-        key: 'star',
-        repeat: 11,
-        setXY: { x: 12, y: 0, stepX: 70 }
-    });
 
-    stars.children.iterate(function (child) {
-        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-    });
-
-    bombs = this.physics.add.group();
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
     this.physics.add.collider(player, platforms);
-    this.physics.add.collider(stars, platforms);
-    this.physics.add.collider(bombs, platforms);
-    this.physics.add.overlap(player, stars, collectStar, null, this);
-    this.physics.add.collider(player, bombs, hitBomb, null, this);
+    this.physics.add.collider(player, ground);
+    //this.physics.add.collider(obstacle, ground);
 }
 
 function update ()
@@ -104,7 +122,7 @@ function update ()
         return;
     }
 
-    if (cursors.left.isDown)
+    /*if (cursors.left.isDown)
     {
         player.setVelocityX(-160);
         player.anims.play('left', true);
@@ -114,44 +132,31 @@ function update ()
         player.setVelocityX(160);
         player.anims.play('right', true);
     }
-    else
+    else {
+        player.setVelocityX(0);
+        player.anims.play('idle_left');
+
+    }*/
+
+    /*if (cursors.left.isUp)
+    {
+        player.setVelocityX(0);
+        player.anims.play('idle_left');
+    }
+    else if (cursors.right.isUp)
     {
         player.setVelocityX(0);
         player.anims.play('idle_right');
-    }
+        console.log("right up");
+    }*/
+    ground.tilePositionX+=0.7;
 
     if (cursors.up.isDown && player.body.touching.down)
     {
         player.setVelocityY(-330);
     }
-}
+    //xp++;
+    //platforms.setPosition(xp, platforms.y);
 
-function collectStar (player, star)
-{
-    star.disableBody(true, true);
-
-    score += 10;
-    scoreText.setText('Score: ' + score);
-
-    if (stars.countActive(true) === 0)
-    {
-        stars.children.iterate(function (child) {
-            child.enableBody(true, child.x, 0, true, true);
-        });
-
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-        var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-    }
-}
-
-function hitBomb (player, bomb)
-{
-    this.physics.pause();
-    player.setTint(0xff0000);
-    player.anims.play('turn');
-    gameOver = true;
 }
 
