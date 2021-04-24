@@ -6,41 +6,42 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 981 },
-            debug: false
+            debug: true
         }
     },
     pixelArt: true,
     scene: {
         preload: preload,
         create: create,
-        update: update
+        update: update,
+        render: render,
     }
 };
 
 var player;
-var stars;
-var bombs;
-var platforms;
-var obstacles;
+var box;
 var cursors;
 var score = 0;
 var gameOver = false;
 var scoreText;
-
-var xp = 0;
+var music;
+var background;
+var bird;
+var sound;
+var state;
+var speed = 0.7;
 
 var game = new Phaser.Game(config);
 
-function preload ()
+function loading(scene)
 {
-    var progressBar = this.add.graphics();
-    var progressBox = this.add.graphics();
-    progressBox.fillStyle(0x99e550, 0.8);//0x222222, 0.8);
+    var progressBar = scene.add.graphics();
+    var progressBox = scene.add.graphics();
+    progressBox.fillStyle(0x99e550, 0.8);
     progressBox.fillRect(240, 270, 320, 50);
-    
-    var width = this.cameras.main.width;
-    var height = this.cameras.main.height;
-    var titleText = this.make.text({
+    var width = scene.cameras.main.width;
+    var height = scene.cameras.main.height;
+    var titleText = scene.make.text({
         x: width/2,
         y: height/2 - 100,
         text: 'SKOAD GAME',
@@ -50,8 +51,7 @@ function preload ()
         }
     });
     titleText.setOrigin(0.5, 0.5);
-
-    var loadingText = this.make.text({
+    var loadingText = scene.make.text({
         x: width / 2,
         y: height / 2 - 50,
         text: 'Loading...',
@@ -62,7 +62,7 @@ function preload ()
     });
     loadingText.setOrigin(0.5, 0.5);
     
-    var percentText = this.make.text({
+    var percentText = scene.make.text({
         x: width / 2,
         y: height / 2 - 5,
         text: '0%',
@@ -72,8 +72,8 @@ function preload ()
         }
     });
     percentText.setOrigin(0.5, 0.5);
-    
-    var assetText = this.make.text({
+
+    var assetText = scene.make.text({
         x: width / 2,
         y: height / 2 + 50,
         text: '',
@@ -84,29 +84,35 @@ function preload ()
     });
 
     assetText.setOrigin(0.5, 0.5);
-    
-    this.load.on('progress', function (value) {
+
+    scene.load.on('progress', function (value) {
         percentText.setText(parseInt(value * 100) + '%');
         progressBar.clear();
         progressBar.fillStyle(0x99e550, 1);//0x6abe30, 1);
         progressBar.fillRect(250, 280, 300 * value, 30);
     });
-    
-    //this.load.on('fileprogress', function (file) {
-    //    assetText.setText('Loading asset: ' + file.key + ' ' + file.percentComplete);
-    //});
 
-    this.load.on('complete', function () {
+    scene.load.on('complete', function () {
         progressBar.destroy();
         progressBox.destroy();
         loadingText.destroy();
         percentText.destroy();
         assetText.destroy();
     });
+}
+
+function preload ()
+{
+    /***********/
+    /* LOADING */
+    /***********/
+    loading(this);
 
     this.load.image('background', 'assets/mont_saint_michel.png');
-    this.load.image('ground', 'assets/ground.png');
-    this.load.image('obstacle', 'assets/obstacle.png');
+    this.load.image('ground', 'assets/ground2.png');
+    this.load.spritesheet('state', 'assets/state.png', { frameWidth: 50, frameHeight: 50 });
+    this.load.spritesheet('sound', 'assets/sound.png', { frameWidth: 50, frameHeight: 50 });
+    this.load.spritesheet('box', 'assets/box.png', { frameWidth: 65, frameHeight: 62 });
     this.load.audio('eye_music', 'assets/skoad_music.mp3');
     this.load.spritesheet('dude', 'assets/skoad_man.png', { frameWidth: 32, frameHeight: 50 });
     this.load.spritesheet('bird', 'assets/bird.png', { frameWidth: 39, frameHeight: 28 });
@@ -114,46 +120,95 @@ function preload ()
 
 function create ()
 {
-    var music = this.sound.add('eye_music');
+    music = this.sound.add('eye_music');
     music.play({loop: true});
 
-    var bg = this.add.image(0, 0, 'background');
-    bg.setOrigin(0, 0);
-    bg.setDisplaySize(config.width, config.height-20);
+    /**************/
+    /* BACKGROUND */
+    /**************/
+    background = this.add.image(0, 0, 'background');
+    background.setOrigin(0, 0);
+    background.setDisplaySize(config.width, config.height-20);
 
-    //platforms = this.physics.add.staticImage(config.width/2, config.height-15, 'ground');
-    //platforms = this.physics.add.image(config.width/2, config.height-15, 'ground');
-    //platforms.setCollideWorldBounds(true);
+    /*********/
+    /* SOUND */
+    /*********/
+    sound = this.add.sprite(config.width-50, 25, 'sound').setInteractive();
+    sound.on('pointerdown', function () {
+        sound.pauseAll();
+        state.setTexture('music', 1);
+    });
 
-    ground = this.add.tileSprite(config.width/2, config.height-15, 0, 0, 'ground');
-    //this.arcade.add.gameObject(ground);
-    //ground.body.setCollideWorldBounds(true);
-    //game.physics.arcade.enable([ground]);
+    /*********/
+    /* PAUSE */
+    /*********/
+    state = this.add.sprite(config.width-100, 25, 'state').setInteractive();
+    state.on('pointerdown', function () {
+        console.log("scene :" + this.scene.scene);
+        console.log("scene :" + this.scene.scene.isActive());
+        this.scene.scene.pause();
+        state.setActive(true);
+        /*if( this.scene.scene.isActive()) {
+            //this.scene.scene.pause();
+       // console.log("scene :" + this.scene.scene);
+            //game.paused = true;
+            music.pause();
+            state.setTexture('state', 1);
+        } else {
+            //this.scene.scene.resume();
+            music.resume();
+            state.setTexture('state', 0);
+        }
+        //game.scene.pause("default");
+        //game.scene.start();*/
+    });
+    
+
+    /**********/
+    /* GROUND */
+    /**********/
+    ground = this.add.tileSprite(config.width/2, config.height, 0, 0, 'ground');
     this.physics.add.existing(ground, false);
     ground.body.setCollideWorldBounds(true);
+    ground.body.setSize(ground.width, ground.height-13);
+    ground.body.setOffset(0, 13);
 
-    var bird = this.add.sprite(300, 100, 'bird');
+    /********/
+    /* BIRD */
+    /********/
+    bird = this.physics.add.sprite(650, 100, 'bird');
     bird.setScale(2);
+    bird.body.setAllowGravity(false);
     this.anims.create({
-        key: 'bleft',
+        key: 'bird',
         frames: this.anims.generateFrameNumbers('bird', { start: 0, end: 4 }),
         frameRate: 10,
         repeat: -1
     });
+    bird.anims.play('bird', true);
 
-    bird.anims.play('bleft', true);
+    /*******/
+    /* BOX */
+    /*******/
+    box = this.physics.add.sprite(750, 100, 'box');
+    box.setScale(1.5);
+    box.body.setSize(box.width, box.height);
+    box.body.setOffset(0, -5);
+    this.anims.create({
+        key: 'box',
+        frames: this.anims.generateFrameNumbers('box', { start: 0, end: 10 }),
+        frameRate: 10,
+        repeat: -1
+    });
+    box.anims.play('box', true);
 
-    /*obstacles = this.physics.add.group();
-    obstacle = obstacles.create(700, 300, 'obstacle');
-    obstacle.setCollideWorldBounds(true);
-    obstacle.setVelocity(-80);
-    this.physics.add.collider(obstacle, platforms);*/
-
+    /**********/
+    /* PLAYER */
+    /**********/
     player = this.physics.add.sprite(100, 100, 'dude');
     player.setScale(2);
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
-
     this.anims.create({
         key: 'left',
         frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 4 }),
@@ -178,12 +233,19 @@ function create ()
     });
     player.anims.play('right', true);
 
-    cursors = this.input.keyboard.createCursorKeys();
 
+    cursors = this.input.keyboard.createCursorKeys();
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
-    this.physics.add.collider(player, platforms);
+
+    /*************/
+    /* COLLISION */
+    /*************/
     this.physics.add.collider(player, ground);
-    //this.physics.add.collider(obstacle, ground);
+    this.physics.add.collider(box, ground);
+    this.physics.add.collider(player, box);
+    this.physics.add.collider(bird, ground);
+    this.physics.add.collider(bird, player);
+
 }
 
 function update ()
@@ -193,41 +255,30 @@ function update ()
         return;
     }
 
-    /*if (cursors.left.isDown)
-    {
-        player.setVelocityX(-160);
-        player.anims.play('left', true);
+    if (Phaser.Math.Between(0, 800) == 2) {
+        this.physics.moveToObject(bird, player, 200);
     }
-    else if (cursors.right.isDown)
-    {
-        player.setVelocityX(160);
-        player.anims.play('right', true);
-    }
-    else {
-        player.setVelocityX(0);
-        player.anims.play('idle_left');
 
-    }*/
-
-    /*if (cursors.left.isUp)
-    {
-        player.setVelocityX(0);
-        player.anims.play('idle_left');
-    }
-    else if (cursors.right.isUp)
-    {
-        player.setVelocityX(0);
-        player.anims.play('idle_right');
-        console.log("right up");
-    }*/
-    ground.tilePositionX+=0.7;
+    ground.tilePositionX += speed;
+    box.x += -speed;
 
     if (cursors.up.isDown && player.body.touching.down)
     {
         player.setVelocityY(-330);
     }
-    //xp++;
-    //platforms.setPosition(xp, platforms.y);
+
+    if (box.x + box.width <= -1) {
+        box.x = config.width - box.width;
+        box.y = 300;
+    }
 
 }
 
+function render()
+{
+/*
+    game.debug.body(ground);
+    game.debug.body(player);
+    game.debug.body(box);
+    */
+}
