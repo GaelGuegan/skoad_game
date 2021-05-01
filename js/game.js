@@ -125,9 +125,9 @@ class Game extends Phaser.Scene
             return;
         }
 
-       /* if (Phaser.Math.Between(0, 800) == 2) {
-            this.physics.moveToObject(bird, player, 200);
-        }*/
+        if (Phaser.Math.Between(0, 800) == 2) {
+            this.physics.moveToObject(this.bird.sprite, this.player.sprite, 200);
+        }
 
         ground.tilePositionX += speed;
         this.box.sprite.x += -speed;
