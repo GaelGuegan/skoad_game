@@ -7,6 +7,8 @@ class Bird extends Phaser.GameObjects.Sprite
         super(scene, x, y);
         this.scene = scene;
         this.sprite = 0;
+        this.initX = 650;
+        this.initY = 100;
     }
 
     preload ()
@@ -16,7 +18,7 @@ class Bird extends Phaser.GameObjects.Sprite
 
     create ()
     {
-        this.sprite = this.scene.physics.add.sprite(650, 100, 'bird');
+        this.sprite = this.scene.physics.add.sprite(this.initX, this.initY, 'bird');
         this.sprite.setScale(2);
         this.sprite.body.setAllowGravity(false);
         this.scene.anims.create({

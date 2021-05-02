@@ -41,12 +41,15 @@ class Game extends Phaser.Scene
         this.load.audio('eye_music', 'assets/skoad_music.mp3');
     }
 
+    birdCollisionCallback(obj1, obj2)
+    {
+        this.physics.moveTo(obj1, 650, 100, 200);
+    }
+
     create ()
     {
         music = this.sound.add('eye_music');
         music.play({loop: true});
-
-
 
         /**************/
         /* BACKGROUND */
@@ -83,7 +86,6 @@ class Game extends Phaser.Scene
             this.scene.scene.pause();
             this.scene.scene.launch('demo');
         });
-        
 
         /**********/
         /* GROUND */
@@ -94,12 +96,9 @@ class Game extends Phaser.Scene
         ground.body.setSize(ground.width, ground.height-13);
         ground.body.setOffset(0, 13);
 
-
         /*******/
         /* BOX */
         /*******/
-
-
         this.player.create();
         this.bird.create();
         this.box.create();
@@ -114,8 +113,7 @@ class Game extends Phaser.Scene
         this.physics.add.collider(this.box.sprite, ground);
         //this.physics.add.collider(player, box);
         //this.physics.add.collider(bird, ground);
-        //this.physics.add.collider(bird, player);
-
+        //this.physics.add.collider(this.bird.sprite, this.player.sprite, this.birdCollisionCallback(), this.processCallback(), this);
     }
 
     update ()
@@ -125,6 +123,13 @@ class Game extends Phaser.Scene
             return;
         }
 
+        this.physics.collide(this.bird.sprite, this.player.sprite, this.birdCollisionCallback, this.processCallback, this);
+
+        if ((this.bird.sprite.body.x <= this.bird.initX + 50 && this.bird.sprite.body.x >= this.bird.initX - 50) && 
+            (this.bird.sprite.body.y <= this.bird.initY + 50 && this.bird.sprite.body.y >= this.bird.initY - 50)) {
+            this.bird.sprite.body.setVelocity(0);
+        }
+
         if (Phaser.Math.Between(0, 800) == 2) {
             this.physics.moveToObject(this.bird.sprite, this.player.sprite, 200);
         }
@@ -132,10 +137,10 @@ class Game extends Phaser.Scene
         ground.tilePositionX += speed;
         this.box.sprite.x += -speed;
 
-        /*if (cursors.up.isDown && player.body.touching.down)
+        if (cursors.up.isDown && this.player.sprite.body.touching.down)
         {
-            player.setVelocityY(-330);
-        }*/
+            this.player.sprite.setVelocityY(-330);
+        }
 
         if (this.box.sprite.x + this.box.sprite.width <= -1) {
             this.box.sprite.x = config.width - this.box.sprite.width;
