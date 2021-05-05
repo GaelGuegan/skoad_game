@@ -6,10 +6,10 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 981 },
-            debug: false
+            debug: true
         }
     },
     pixelArt: true,
-    scene: [ Game, Pause ]
+    scene: [ Game, Pause, GameOver ]
 };
 var game = new Phaser.Game(config);

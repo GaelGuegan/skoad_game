@@ -41,9 +41,16 @@ class Game extends Phaser.Scene
         this.load.audio('eye_music', 'assets/skoad_music.mp3');
     }
 
-    birdCollisionCallback(obj1, obj2)
+    birdPlayerCollisionCallback(_bird, player)
     {
-        this.physics.moveTo(obj1, 650, 100, 200);
+        this.physics.moveTo(_bird, 650, 100, 200);
+    }
+    boxPlayerCollisionCallback(_box, _player)
+    {
+        if (this.player.life > 0) {
+            this.player.images[this.player.life-1].destroy();
+            this.player.life = this.player.life - 1;
+        }
     }
 
     create ()
@@ -84,7 +91,7 @@ class Game extends Phaser.Scene
                 music.resume();
             }
             this.scene.scene.pause();
-            this.scene.scene.launch('demo');
+            this.scene.scene.launch('pause');
         });
 
         /**********/
@@ -96,9 +103,9 @@ class Game extends Phaser.Scene
         ground.body.setSize(ground.width, ground.height-13);
         ground.body.setOffset(0, 13);
 
-        /*******/
-        /* BOX */
-        /*******/
+        /********************/
+        /* OBJECTS CREATION */
+        /********************/
         this.player.create();
         this.bird.create();
         this.box.create();
@@ -111,34 +118,30 @@ class Game extends Phaser.Scene
         /*************/
         this.physics.add.collider(this.player.sprite, ground);
         this.physics.add.collider(this.box.sprite, ground);
-        //this.physics.add.collider(player, box);
+        //his.physics.add.collider(this.player.sprite, this.box.sprite);
         //this.physics.add.collider(bird, ground);
         //this.physics.add.collider(this.bird.sprite, this.player.sprite, this.birdCollisionCallback(), this.processCallback(), this);
     }
 
     update ()
     {
-        if (gameOver)
-        {
-            return;
+        if (this.player.life == 0) {
+            this.scene.pause();
+            this.scene.launch('gameover');
         }
 
-        this.physics.collide(this.bird.sprite, this.player.sprite, this.birdCollisionCallback, this.processCallback, this);
+        this.physics.collide(this.box.sprite, this.player.sprite, this.boxPlayerCollisionCallback, 0, this);
+        this.physics.collide(this.bird.sprite, this.player.sprite, this.birdPlayerCollisionCallback, 0, this);
+        this.bird.update();
 
-        if ((this.bird.sprite.body.x <= this.bird.initX + 50 && this.bird.sprite.body.x >= this.bird.initX - 50) && 
-            (this.bird.sprite.body.y <= this.bird.initY + 50 && this.bird.sprite.body.y >= this.bird.initY - 50)) {
-            this.bird.sprite.body.setVelocity(0);
-        }
-
-        if (Phaser.Math.Between(0, 800) == 2) {
+        if (Phaser.Math.Between(0, 500/*800*/) == 1 && this.bird.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO)) {
             this.physics.moveToObject(this.bird.sprite, this.player.sprite, 200);
         }
 
         ground.tilePositionX += speed;
         this.box.sprite.x += -speed;
 
-        if (cursors.up.isDown && this.player.sprite.body.touching.down)
-        {
+        if (cursors.up.isDown && this.player.sprite.body.touching.down) {
             this.player.sprite.setVelocityY(-330);
         }
 

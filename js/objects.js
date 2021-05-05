@@ -30,13 +30,23 @@ class Bird extends Phaser.GameObjects.Sprite
         this.sprite.anims.play('bird', true);
     }
 
+    /*playerCollisionCallback(bird, player)
+    {
+    	console.log("oiugiug");
+    	console.log(this.physics);
+        this.physics.moveTo(this.sprite, this.initX, this.initY, 200);
+    	console.log("zzzz");
+    }*/
+
     update ()
     {
 
-        /*if (cursors.up.isDown && player.body.touching.down)
-        {
-            this.setVelocityY(-330);
-        }*/
+        if ((this.sprite.body.x <= this.initX + 50 && this.sprite.body.x >= this.initX - 50) && 
+            (this.sprite.body.y <= this.initY + 50 && this.sprite.body.y >= this.initY - 50) &&
+            !this.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO) &&
+            this.sprite.body.velocity.x > 0){
+            this.sprite.body.setVelocity(0);
+        }
     }
 }
 
@@ -73,10 +83,5 @@ class Box extends Phaser.GameObjects.Sprite
 
     update ()
     {
-
-        /*if (cursors.up.isDown && player.body.touching.down)
-        {
-            this.setVelocityY(-330);
-        }*/
     }
 }

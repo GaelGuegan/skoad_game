@@ -7,11 +7,19 @@ class Player extends Phaser.GameObjects.Sprite
         super(scene, x, y);
         this.scene = scene;
         this.sprite = 0;
+        this.life = 3;
+        this.images = [];
     }
 
     preload ()
     {
         this.scene.load.spritesheet('dude', 'assets/skoad_man.png', { frameWidth: 32, frameHeight: 50 });
+        this.scene.load.image('life', 'assets/life.png');
+    }
+
+    playerBoxCollisionCallback(box, player)
+    {
+        player.life = player.life - 1;
     }
 
     create ()
@@ -21,8 +29,11 @@ class Player extends Phaser.GameObjects.Sprite
         this.sprite.setScale(2);
         this.sprite.setBounce(0.2);
         this.sprite.setCollideWorldBounds(true);
+        this.sprite.body.setImmovable(true);
 
-        console.log(this);
+        for (var i = 0; i < this.life; i++) {
+            this.images[i] = this.scene.add.image(220 + i*30, 30, 'life');
+        }
 
         this.scene.anims.create({
             key: 'left',
@@ -43,7 +54,7 @@ class Player extends Phaser.GameObjects.Sprite
         this.scene.anims.create({
             key: 'right',
             frames: this.scene.anims.generateFrameNumbers('dude', { start: 7, end: 11 }),
-            frameRate: 10,
+            frameRate: 8,
             repeat: -1
         });
 
