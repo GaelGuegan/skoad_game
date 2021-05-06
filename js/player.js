@@ -32,7 +32,7 @@ class Player extends Phaser.GameObjects.Sprite
         this.sprite.body.setImmovable(true);
 
         for (var i = 0; i < this.life; i++) {
-            this.images[i] = this.scene.add.image(220 + i*30, 30, 'life');
+            this.images[i] = this.scene.add.image(220 + i*30, 17, 'life');
         }
 
         this.scene.anims.create({

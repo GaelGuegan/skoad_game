@@ -3,7 +3,6 @@ class Pause extends Phaser.Scene
     constructor ()
     {
         super('pause');
-        this.state = 0;
     }
 
     preload ()
@@ -13,17 +12,12 @@ class Pause extends Phaser.Scene
 
     create ()
     {
-        this.state = this.add.rectangle(config.width-100, 25, 50, 50, 0, 0).setInteractive();
-        this.state.on('pointerdown', function() {
+        this.input.on('pointerdown', function() {
             this.scene.scene.stop();
-            this.scene.scene.resume('background');
+            this.scene.scene.resume('game');
         });
 
         var pause = this.add.image(config.width/2, config.height/2, 'pause');
-    }
-
-    update ()
-    {
     }
 }
 
@@ -40,12 +34,11 @@ class GameOver extends Phaser.Scene
     }
 
     create ()
-    {
-        /*this.state = this.add.rectangle(config.width-100, 25, 50, 50, 0, 0).setInteractive();
-        this.state.on('pointerdown', function() {
+    { 
+        this.input.on('pointerdown', function() {
             this.scene.scene.stop();
-            this.scene.scene.resume('background');
-        });*/
+            this.scene.scene.restart('game');
+        });
 
         var gameover = this.add.image(config.width/2, config.height/2, 'gameover');
     }

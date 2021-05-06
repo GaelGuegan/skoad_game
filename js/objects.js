@@ -18,6 +18,7 @@ class Bird extends Phaser.GameObjects.Sprite
 
     create ()
     {
+        /* CREATING IMAGE */
         this.sprite = this.scene.physics.add.sprite(this.initX, this.initY, 'bird');
         this.sprite.setScale(2);
         this.sprite.body.setAllowGravity(false);
@@ -30,17 +31,17 @@ class Bird extends Phaser.GameObjects.Sprite
         this.sprite.anims.play('bird', true);
     }
 
-    /*playerCollisionCallback(bird, player)
+    playerCollisionCallback(_bird, _player)
     {
-    	console.log("oiugiug");
-    	console.log(this.physics);
-        this.physics.moveTo(this.sprite, this.initX, this.initY, 200);
-    	console.log("zzzz");
-    }*/
+        console.log("oiugiug");
+        //this.scene.physics.moveTo(this.sprite, this.initX, this.initY, 200);
+        this.physics.moveTo(this.bird.sprite, this.bird.initX, this.initY, 200);
+        console.log("zzzz");
+    }
 
     update ()
     {
-
+        /* BIRD STAYING ON SPOT */
         if ((this.sprite.body.x <= this.initX + 50 && this.sprite.body.x >= this.initX - 50) && 
             (this.sprite.body.y <= this.initY + 50 && this.sprite.body.y >= this.initY - 50) &&
             !this.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO) &&
@@ -52,8 +53,6 @@ class Bird extends Phaser.GameObjects.Sprite
 
 class Box extends Phaser.GameObjects.Sprite
 {
-    static NORMAL = 0;
-
     constructor (scene, x, y)
     {
         super(scene, x, y);
@@ -63,7 +62,7 @@ class Box extends Phaser.GameObjects.Sprite
 
     preload ()
     {
-        this.scene.load.spritesheet('bird', 'assets/box.png', { frameWidth: 39, frameHeight: 28 });
+        this.scene.load.spritesheet('box', 'assets/box.png', { frameWidth: 65, frameHeight: 62 });
     }
 
     create ()
@@ -80,8 +79,68 @@ class Box extends Phaser.GameObjects.Sprite
         });
         this.sprite.anims.play('box', true);
     }
+}
+
+class Ground extends Phaser.GameObjects.Sprite
+{
+    constructor (scene, x, y)
+    {
+        super(scene, x, y);
+        this.scene = scene;
+        this.sprite = 0;
+    }
+
+    preload ()
+    {
+        this.scene.load.image('ground', 'assets/ground2.png');
+    }
+
+    create ()
+    {
+        this.sprite = this.scene.add.tileSprite(config.width/2, config.height, 0, 0, 'ground');
+        this.scene.physics.add.existing(this.sprite, false);
+        this.sprite.body.setCollideWorldBounds(true);
+        this.sprite.body.setSize(this.sprite.width, this.sprite.height-13);
+        this.sprite.body.setOffset(0, 13);
+    }
+}
+
+class Music extends Phaser.GameObjects.Sprite
+{
+    constructor (scene, x, y)
+    {
+        super(scene, x, y);
+        this.scene = scene;
+        this.sprite = 0;
+        this.music = 0;
+    }
+
+    preload ()
+    {
+        this.scene.load.spritesheet('sound', 'assets/sound.png', { frameWidth: 50, frameHeight: 50 });
+        this.scene.load.audio('eye_music', 'assets/skoad_music.mp3');
+    }
+
+    create ()
+    {
+        this.music = this.scene.sound.add('eye_music');
+        this.music.play({loop: true});
+
+        this.sprite = this.scene.add.sprite(config.width-50, 25, 'sound');
+        this.sprite.setInteractive();
+        this.sprite.on('pointerdown', function () {
+            this.update();
+        });
+    }
 
     update ()
     {
+        if (this.music.isPlaying) {
+            this.music.pause();
+            this.sprite.setTexture('sound', 1);
+        } else {
+            this.music.resume();
+            this.sprite.setTexture('sound', 0);
+        }
     }
 }
