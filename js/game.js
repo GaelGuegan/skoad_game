@@ -42,6 +42,10 @@ class Game extends Phaser.Scene
     birdPlayerCollisionCallback(_bird, player)
     {
         this.physics.moveTo(_bird, 650, 100, 200);
+        if (this.player.life > 0) {
+            this.player.images[this.player.life-1].destroy();
+            this.player.life = this.player.life - 1;
+        }
     }
     boxPlayerCollisionCallback(_box, _player)
     {

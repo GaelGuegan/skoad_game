@@ -37,7 +37,7 @@ class GameOver extends Phaser.Scene
     { 
         this.input.on('pointerdown', function() {
             this.scene.scene.stop();
-            this.scene.scene.restart('game');
+            this.scene.scene.start('game');
         });
 
         var gameover = this.add.image(config.width/2, config.height/2, 'gameover');
