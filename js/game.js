@@ -1,9 +1,7 @@
 var cursors;
 var scoreText;
 var background;
-var bird;
 var sound;
-var state;
 var speed = 0.7;
 
 class Game extends Phaser.Scene
@@ -16,6 +14,7 @@ class Game extends Phaser.Scene
         this.box = 0;
         this.ground = 0;
         this.music = 0;
+        this.state = 0;
     }
 
     preload ()
@@ -26,17 +25,16 @@ class Game extends Phaser.Scene
         this.box = new Box(this, 100, 100);
         this.ground = new Ground(this, 10, 10); 
         this.music = new Music(this, 10, 10); 
+        this.state = new State(this, 10, 10);
 
         this.player.preload();
         this.bird.preload();
         this.box.preload();
         this.ground.preload();
         this.music.preload();
+        this.state.preload();
 
         this.load.image('background', 'assets/mont_saint_michel.png');
-        this.load.spritesheet('state', 'assets/state.png', { frameWidth: 50, frameHeight: 50 });
-        //this.load.spritesheet('sound', 'assets/sound.png', { frameWidth: 50, frameHeight: 50 });
-        //this.load.audio('eye_music', 'assets/skoad_music.mp3');
     }
 
     birdPlayerCollisionCallback(_bird, player)
@@ -75,21 +73,11 @@ class Game extends Phaser.Scene
         this.bird.create();
         this.box.create();
         this.music.create();
+        this.state.create();
 
-        /*********/
-        /* PAUSE */
-        /*********/
-        state = this.add.sprite(config.width-100, 25, 'state').setInteractive();
-        state.setFrame(1);
-        state.on('pointerdown', function () {
-            this.scene.music.update();
-            state.setFrame(0);
-            this.scene.scene.pause();
-            this.scene.scene.launch('pause');
-        });
         this.events.on('resume', function (a) {
             a.scene.music.update();
-            state.setFrame(1);
+            a.scene.state.sprite.setFrame(1);
         });
 
         cursors = this.input.keyboard.createCursorKeys();

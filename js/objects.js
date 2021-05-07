@@ -33,10 +33,8 @@ class Bird extends Phaser.GameObjects.Sprite
 
     playerCollisionCallback(_bird, _player)
     {
-        console.log("oiugiug");
         //this.scene.physics.moveTo(this.sprite, this.initX, this.initY, 200);
         this.physics.moveTo(this.bird.sprite, this.bird.initX, this.initY, 200);
-        console.log("zzzz");
     }
 
     update ()
@@ -128,8 +126,8 @@ class Music extends Phaser.GameObjects.Sprite
 
         this.sprite = this.scene.add.sprite(config.width-50, 25, 'sound');
         this.sprite.setInteractive();
-        this.sprite.on('pointerdown', function () {
-            this.update();
+        this.sprite.on('pointerdown', function (a) {
+            this.scene.music.update();
         });
     }
 
@@ -142,5 +140,32 @@ class Music extends Phaser.GameObjects.Sprite
             this.music.resume();
             this.sprite.setTexture('sound', 0);
         }
+    }
+}
+
+class State extends Phaser.GameObjects.Sprite
+{
+    constructor (scene, x, y)
+    {
+        super(scene, x, y);
+        this.scene = scene;
+        this.sprite = 0;
+    }
+
+    preload ()
+    {
+        this.scene.load.spritesheet('state', 'assets/state.png', { frameWidth: 50, frameHeight: 50 });
+    }
+
+    create ()
+    {
+        this.sprite = this.scene.add.sprite(config.width-100, 25, 'state').setInteractive();
+        this.sprite.setFrame(1);
+        this.sprite.on('pointerdown', function () {
+            this.scene.music.update();
+            this.setFrame(0);
+            this.scene.scene.pause();
+            this.scene.scene.launch('pause');
+        });
     }
 }
