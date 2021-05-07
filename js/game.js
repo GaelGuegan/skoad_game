@@ -101,7 +101,7 @@ class Game extends Phaser.Scene
     update ()
     {
         if (this.player.life == 0) {
-            this.music.pause();
+            this.music.music.pause();
             this.scene.pause();
             this.scene.launch('gameover');
         }
