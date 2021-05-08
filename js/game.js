@@ -1,8 +1,5 @@
 var cursors;
-var scoreText;
 var background;
-var sound;
-var speed = 0.7;
 
 class Game extends Phaser.Scene
 {
@@ -15,6 +12,8 @@ class Game extends Phaser.Scene
         this.ground = 0;
         this.music = 0;
         this.state = 0;
+        this.score = 0;
+        this.speed = 3;
     }
 
     preload ()
@@ -81,7 +80,7 @@ class Game extends Phaser.Scene
         });
 
         cursors = this.input.keyboard.createCursorKeys();
-        scoreText = this.add.text(16, 3, 'Score: 0', { fontSize: '30px', fill: '#000' });
+        this.score = this.add.text(16, 3, 'Score: 0', { fontSize: '30px', fill: '#000' });
 
         /*************/
         /* COLLISION */
@@ -102,16 +101,18 @@ class Game extends Phaser.Scene
         this.physics.collide(this.bird.sprite, this.player.sprite, this.birdPlayerCollisionCallback, 0, this);
         //this.physics.collide(this.bird.sprite, this.player.sprite, this.bird.playerCollisionCallback, 0, this);
         this.bird.update();
+        this.bird.attack(this.player.sprite);
 
-        if (Phaser.Math.Between(0, 500/*800*/) == 1 && this.bird.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO)) {
-            this.physics.moveToObject(this.bird.sprite, this.player.sprite, 200);
-        }
-
-        this.ground.sprite.tilePositionX += speed;
-        this.box.sprite.x += -speed;
+        this.ground.sprite.tilePositionX += this.speed;
+        this.box.sprite.x += - this.speed;
 
         if (cursors.up.isDown && this.player.sprite.body.touching.down) {
-            this.player.sprite.setVelocityY(-330);
+            this.player.sprite.setVelocityY(-500);
+        }
+        if (!this.player.sprite.body.touching.down) {
+            this.player.sprite.anims.play('jump_right', true);
+        } else {
+            this.player.sprite.anims.play('right', true);
         }
 
         if (this.box.sprite.x + this.box.sprite.width <= -1) {

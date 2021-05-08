@@ -13,7 +13,7 @@ class Bird extends Phaser.GameObjects.Sprite
 
     preload ()
     {
-        this.scene.load.spritesheet('bird', 'assets/bird.png', { frameWidth: 39, frameHeight: 28 });
+        this.scene.load.spritesheet('bird', 'assets/bird.png', { frameWidth: 25, frameHeight: 25 });
     }
 
     create ()
@@ -31,10 +31,17 @@ class Bird extends Phaser.GameObjects.Sprite
         this.sprite.anims.play('bird', true);
     }
 
+    attack(player)
+    {
+        if (Phaser.Math.Between(0, 800) == 1 && this.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO)) {
+            this.scene.physics.moveToObject(this.sprite, player, 200);
+        }
+    }
+
     playerCollisionCallback(_bird, _player)
     {
         //this.scene.physics.moveTo(this.sprite, this.initX, this.initY, 200);
-        this.physics.moveTo(this.bird.sprite, this.bird.initX, this.initY, 200);
+        this.scene.physics.moveTo(this.bird.sprite, this.bird.initX, this.initY, 200);
     }
 
     update ()
@@ -60,7 +67,7 @@ class Box extends Phaser.GameObjects.Sprite
 
     preload ()
     {
-        this.scene.load.spritesheet('box', 'assets/box.png', { frameWidth: 65, frameHeight: 62 });
+        this.scene.load.spritesheet('box', 'assets/box.png', { frameWidth: 37, frameHeight: 41 });
     }
 
     create ()
@@ -71,8 +78,8 @@ class Box extends Phaser.GameObjects.Sprite
         this.sprite.body.setOffset(0, -5);
         this.scene.anims.create({
             key: 'box',
-            frames: this.scene.anims.generateFrameNumbers('box', { start: 0, end: 10 }),
-            frameRate: 10,
+            frames: this.scene.anims.generateFrameNumbers('box', { start: 0, end: 3 }),
+            frameRate: 2,
             repeat: -1
         });
         this.sprite.anims.play('box', true);

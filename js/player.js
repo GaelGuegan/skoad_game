@@ -13,7 +13,7 @@ class Player extends Phaser.GameObjects.Sprite
 
     preload ()
     {
-        this.scene.load.spritesheet('dude', 'assets/skoad_man.png', { frameWidth: 32, frameHeight: 50 });
+        this.scene.load.spritesheet('dude', 'assets/skoad_man.png', { frameWidth: 28, frameHeight: 50 });
         this.scene.load.image('life', 'assets/life.png');
     }
 
@@ -27,7 +27,7 @@ class Player extends Phaser.GameObjects.Sprite
         this.sprite = this.scene.physics.add.sprite(100, 100, 'dude');
         this.sprite.setState(this.NORMAL);
         this.sprite.setScale(2);
-        this.sprite.setBounce(0.2);
+        this.sprite.setBounce(0);
         this.sprite.setCollideWorldBounds(true);
         this.sprite.body.setImmovable(true);
 
@@ -53,9 +53,16 @@ class Player extends Phaser.GameObjects.Sprite
         });
         this.scene.anims.create({
             key: 'right',
-            frames: this.scene.anims.generateFrameNumbers('dude', { start: 7, end: 11 }),
+            //frames: this.scene.anims.generateFrameNumbers('dude', { start: 7, end: 11 }),
+            frames: this.scene.anims.generateFrameNumbers('dude', { start: 9, end: 13 }),
             frameRate: 8,
             repeat: -1
+        });
+        this.scene.anims.create({
+            key: 'jump_right',
+            //frames: this.scene.anims.generateFrameNumbers('dude', { start: 9, end: 13 }),
+            frames: [ { key: 'dude', frame: 6 } ],
+            frameRate: 8
         });
 
         this.sprite.anims.play('right', true);
