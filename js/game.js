@@ -109,11 +109,8 @@ class Game extends Phaser.Scene
         if (cursors.up.isDown && this.player.sprite.body.touching.down) {
             this.player.sprite.setVelocityY(-500);
         }
-        if (!this.player.sprite.body.touching.down) {
-            this.player.sprite.anims.play('jump_right', true);
-        } else {
-            this.player.sprite.anims.play('right', true);
-        }
+
+        this.player.update();
 
         if (this.box.sprite.x + this.box.sprite.width <= -1) {
             this.box.sprite.x = config.width - this.box.sprite.width;

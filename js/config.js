@@ -6,7 +6,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 981 },
-            debug: true
+            debug: false
         }
     },
     pixelArt: true,
