@@ -12,6 +12,7 @@ class Game extends Phaser.Scene
         this.ground = 0;
         this.music = 0;
         this.state = 0;
+        this.scoreText = 0;
         this.score = 0;
         this.speed = 3;
     }
@@ -80,7 +81,7 @@ class Game extends Phaser.Scene
         });
 
         cursors = this.input.keyboard.createCursorKeys();
-        this.score = this.add.text(16, 3, 'Score: 0', { fontSize: '30px', fill: '#000' });
+        this.scoreText = this.add.text(16, 3, 'Score: 0', { fontSize: '30px', fill: '#000' });
 
         /*************/
         /* COLLISION */
@@ -113,6 +114,8 @@ class Game extends Phaser.Scene
         this.player.update();
 
         if (this.box.sprite.x + this.box.sprite.width <= -1) {
+             this.score = this.score + 1;
+            this.scoreText.setText('Score: ' + this.score);
             this.box.sprite.x = config.width - this.box.sprite.width;
             this.box.sprite.y = 300;
         }
