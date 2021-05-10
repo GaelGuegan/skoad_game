@@ -8,7 +8,7 @@ class Player extends Phaser.GameObjects.Sprite
         this.scene = scene;
         this.sprite = 0;
         this.life = 3;
-        this.images = [];
+        this.lifeImages = [];
     }
 
     preload ()
@@ -22,6 +22,21 @@ class Player extends Phaser.GameObjects.Sprite
         player.life = player.life - 1;
     }
 
+    clearPlayerTint()
+    {
+        this.sprite.clearTint();
+    }
+
+    removeLife()
+    {
+        if (this.life > 0) {
+            this.lifeImages[this.life - 1].destroy();
+            this.life = this.life - 1;
+            this.sprite.setTint(0xff0000);
+            this.scene.time.delayedCall(800, this.clearPlayerTint, [], this);
+        }
+    }
+
     create()
     {
         this.sprite = this.scene.physics.add.sprite(100, 100, 'dude');
@@ -32,7 +47,7 @@ class Player extends Phaser.GameObjects.Sprite
         this.sprite.body.setImmovable(true);
 
         for (var i = 0; i < this.life; i++) {
-            this.images[i] = this.scene.add.image(220 + i*30, 17, 'life');
+            this.lifeImages[i] = this.scene.add.image(220 + i*30, 17, 'life');
         }
 
         this.scene.anims.create({
@@ -51,14 +66,12 @@ class Player extends Phaser.GameObjects.Sprite
         });
         this.scene.anims.create({
             key: 'right',
-            //frames: this.scene.anims.generateFrameNumbers('dude', { start: 7, end: 11 }),
             frames: this.scene.anims.generateFrameNumbers('dude', { start: 9, end: 13 }),
             frameRate: 8,
             repeat: -1
         });
         this.scene.anims.create({
             key: 'jump_right',
-            //frames: this.scene.anims.generateFrameNumbers('dude', { start: 9, end: 13 }),
             frames: [ { key: 'dude', frame: 6 } ],
         });
         this.scene.anims.create({
@@ -71,11 +84,6 @@ class Player extends Phaser.GameObjects.Sprite
 
     update()
     {
-
-        /*if (cursors.up.isDown && player.body.touching.down)
-        {
-            this.setVelocityY(-330);
-        }*/
         if (!this.sprite.body.touching.down) {
             if (this.sprite.body.velocity.y < 200 && this.sprite.body.velocity.y > -100) {
                 this.sprite.anims.play('jump_up', true);
