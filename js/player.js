@@ -9,12 +9,14 @@ class Player extends Phaser.GameObjects.Sprite
         this.sprite = 0;
         this.life = 3;
         this.lifeImages = [];
+        this.hurtSound = 0;
     }
 
     preload ()
     {
         this.scene.load.spritesheet('dude', 'assets/skoad_man.png', { frameWidth: 28, frameHeight: 50 });
         this.scene.load.image('life', 'assets/life.png');
+        this.scene.load.audio('hurt', 'assets/hurt.wav');
     }
 
     playerBoxCollisionCallback(box, player)
@@ -30,6 +32,7 @@ class Player extends Phaser.GameObjects.Sprite
     removeLife()
     {
         if (this.life > 0) {
+            this.hurtSound.play();
             this.lifeImages[this.life - 1].destroy();
             this.life = this.life - 1;
             this.sprite.setTint(0xff0000);
@@ -40,6 +43,7 @@ class Player extends Phaser.GameObjects.Sprite
     create()
     {
         this.sprite = this.scene.physics.add.sprite(100, 100, 'dude');
+        this.hurtSound = this.scene.sound.add('hurt');
         this.sprite.setState(this.NORMAL);
         this.sprite.setScale(2);
         this.sprite.setBounce(0);
