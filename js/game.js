@@ -1,3 +1,5 @@
+
+
 var cursors;
 var background;
 
@@ -46,7 +48,7 @@ class Game extends Phaser.Scene
     boxPlayerCollisionCallback(_box, _player)
     {
         this.player.removeLife();
-        this.box.sprite.x = config.width - this.box.sprite.width;
+        this.box.sprite.x = this.sys.game.config.width - this.box.sprite.width;
         this.box.sprite.y = 300;
     }
 
@@ -57,8 +59,7 @@ class Game extends Phaser.Scene
         /**************/
         background = this.add.image(0, 0, 'background');
         background.setOrigin(0, 0);
-        background.setDisplaySize(config.width, config.height-20);
-
+        background.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height - 20);
 
         /********************/
         /* OBJECTS CREATION */
@@ -111,9 +112,43 @@ class Game extends Phaser.Scene
         if (this.box.sprite.x + this.box.sprite.width <= -1) {
              this.score = this.score + 1;
             this.scoreText.setText('Score: ' + this.score);
-            this.box.sprite.x = config.width - this.box.sprite.width;
+            this.box.sprite.x = this.sys.game.config.width - this.box.sprite.width;
             this.box.sprite.y = 300;
         }
 
     }
+}
+
+class Preloader extends Phaser.Scene {
+
+    constructor ()
+    {
+        super('Preloader');
+    }
+
+    create ()
+    {
+        //this.facebook.showLoadProgress(this);
+        this.facebook.once('startgame', this.startGame, this);
+        this.facebook.gameStarted();
+
+        /*this.scene.load.spritesheet('box', 'assets/box.png', { frameWidth: 37, frameHeight: 41 });
+        this.scene.load.image('ground', 'assets/ground2.png');
+        this.scene.load.spritesheet('sound', 'assets/sound.png', { frameWidth: 50, frameHeight: 50 });
+        this.scene.load.audio('eye_music', 'assets/skoad_music.mp3');
+        this.scene.load.spritesheet('state', 'assets/state.png', { frameWidth: 50, frameHeight: 50 });
+        this.scene.load.spritesheet('bird', 'assets/bird.png', { frameWidth: 25, frameHeight: 25 });
+        this.load.image('background', 'assets/mont_saint_michel.png');*/
+        /*FBInstant.setLoadingProgress(100);
+        FBInstant.startGameAsync().then(function() {
+          this.startGame();
+        });*/
+
+    }
+
+    startGame ()
+    {
+        this.scene.start('game');
+    }
+
 }

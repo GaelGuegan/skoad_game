@@ -44,7 +44,7 @@ class Player extends Phaser.GameObjects.Sprite
     {
         this.sprite = this.scene.physics.add.sprite(100, 100, 'dude');
         this.hurtSound = this.scene.sound.add('hurt');
-        this.sprite.setState(this.NORMAL);
+        //this.sprite.setState(this.NORMAL);
         this.sprite.setScale(2);
         this.sprite.setBounce(0);
         this.sprite.setCollideWorldBounds(true);

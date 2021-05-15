@@ -41,7 +41,7 @@ class Bird extends Phaser.GameObjects.Sprite
     playerCollisionCallback(_bird, _player)
     {
         //this.scene.physics.moveTo(this.sprite, this.initX, this.initY, 200);
-        this.scene.physics.moveTo(this.bird.sprite, this.bird.initX, this.initY, 200);
+        this.scene.physics.moveTo(this.bird.sprite, this.initX, this.initY, 200);
     }
 
     update ()
@@ -102,10 +102,10 @@ class Ground extends Phaser.GameObjects.Sprite
 
     create ()
     {
-        this.sprite = this.scene.add.tileSprite(config.width/2, config.height, 0, 0, 'ground');
+        this.sprite = this.scene.add.tileSprite(this.scene.sys.game.config.width/2, this.scene.sys.game.config.height, 0, 0, 'ground');
         this.scene.physics.add.existing(this.sprite, false);
         this.sprite.body.setCollideWorldBounds(true);
-        this.sprite.body.setSize(this.sprite.width, this.sprite.height-13);
+        this.sprite.body.setSize(this.scene.sys.game.config.width, this.sprite.height-13);
         this.sprite.body.setOffset(0, 13);
     }
 }
@@ -131,7 +131,7 @@ class Music extends Phaser.GameObjects.Sprite
         this.music = this.scene.sound.add('eye_music');
         this.music.play({loop: true});
 
-        this.sprite = this.scene.add.sprite(config.width-50, 25, 'sound');
+        this.sprite = this.scene.add.sprite(this.scene.sys.game.config.width-50, 25, 'sound');
         this.sprite.setInteractive();
         this.sprite.on('pointerdown', function (a) {
             this.scene.music.update();
@@ -166,7 +166,7 @@ class State extends Phaser.GameObjects.Sprite
 
     create ()
     {
-        this.sprite = this.scene.add.sprite(config.width-100, 25, 'state').setInteractive();
+        this.sprite = this.scene.add.sprite(this.scene.sys.game.config.width-100, 25, 'state').setInteractive();
         this.sprite.setFrame(1);
         this.sprite.on('pointerdown', function () {
             this.scene.music.update();
