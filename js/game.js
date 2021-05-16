@@ -98,6 +98,7 @@ class Game extends Phaser.Scene
         //this.physics.collide(this.bird.sprite, this.player.sprite, this.bird.playerCollisionCallback, 0, this);
         this.bird.update();
         this.bird.attack(this.player.sprite);
+        this.bird.shit(this.player.sprite);
 
         this.ground.sprite.tilePositionX += this.speed;
         this.box.sprite.x += - this.speed;

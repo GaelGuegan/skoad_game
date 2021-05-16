@@ -38,10 +38,17 @@ class Bird extends Phaser.GameObjects.Sprite
         }
     }
 
+    shit(player)
+    {
+        if (Phaser.Math.Between(0, 800) == 1 && this.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO)) {
+            this.scene.physics.moveTo(this.sprite, player.x, player.y - 50, 200);
+        }
+    }
+
     playerCollisionCallback(_bird, _player)
     {
         //this.scene.physics.moveTo(this.sprite, this.initX, this.initY, 200);
-        this.scene.physics.moveTo(this.bird.sprite, this.bird.initX, this.initY, 200);
+        //this.scene.physics.moveTo(this.bird.sprite, this.initX, this.initY, 200);
     }
 
     update ()
@@ -52,6 +59,11 @@ class Bird extends Phaser.GameObjects.Sprite
             !this.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO) &&
             this.sprite.body.velocity.x > 0){
             this.sprite.body.setVelocity(0);
+        }
+
+        /* BIRD GOING BACK */
+        if (this.sprite.x == 0) {
+            this.scene.physics.moveTo(this.sprite, this.initX, this.initY, 200);
         }
     }
 }
