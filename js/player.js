@@ -15,6 +15,7 @@ class Player extends Phaser.GameObjects.Sprite
     preload ()
     {
         this.scene.load.spritesheet('dude', 'assets/skoad_man.png', { frameWidth: 28, frameHeight: 50 });
+        this.scene.load.spritesheet('dude_squat', 'assets/skoad_man_squat.png', { frameWidth: 20, frameHeight: 33 });
         this.scene.load.image('life', 'assets/life.png');
         this.scene.load.audio('hurt', 'assets/hurt.wav');
     }
@@ -82,13 +83,17 @@ class Player extends Phaser.GameObjects.Sprite
             key: 'jump_up',
             frames: [ { key: 'dude', frame: 7 } ],
         });
+        this.scene.anims.create({
+            key: 'squat',
+            frames: [ { key: 'dude_squat'} ],
+        });
 
         this.sprite.anims.play('right', true);
     }
 
     update()
     {
-        if (!this.sprite.body.touching.down) {
+        /*if (!this.sprite.body.touching.down) {
             if (this.sprite.body.velocity.y < 200 && this.sprite.body.velocity.y > -100) {
                 this.sprite.anims.play('jump_up', true);
             } else {
@@ -96,6 +101,6 @@ class Player extends Phaser.GameObjects.Sprite
             }
         } else {
             this.sprite.anims.play('right', true);
-        }
+        }*/
     }
 }

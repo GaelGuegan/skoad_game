@@ -1,4 +1,3 @@
-var cursors;
 var background;
 
 class Game extends Phaser.Scene
@@ -15,6 +14,7 @@ class Game extends Phaser.Scene
         this.scoreText = 0;
         this.score = 0;
         this.speed = 3;
+        this.cursors = 0;
     }
 
     preload ()
@@ -75,7 +75,7 @@ class Game extends Phaser.Scene
             a.scene.state.sprite.setFrame(1);
         });
 
-        cursors = this.input.keyboard.createCursorKeys();
+        this.cursors = this.input.keyboard.createCursorKeys();
         this.scoreText = this.add.text(16, 3, 'Score: 0', { fontSize: '30px', fill: '#000' });
 
         /*************/
@@ -105,6 +105,10 @@ class Game extends Phaser.Scene
 
         if (cursors.up.isDown && this.player.sprite.body.touching.down) {
             this.player.sprite.setVelocityY(-500);
+        }
+
+        if (cursors.space.isDown ) {//&& this.player.sprite.body.touching.down) {
+            this.player.sprite.anims.play('squat', true);
         }
 
         this.player.update();
