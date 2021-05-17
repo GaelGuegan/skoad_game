@@ -7,8 +7,9 @@ class Bird extends Phaser.GameObjects.Sprite
         super(scene, x, y);
         this.scene = scene;
         this.sprite = 0;
-        this.initX = 650;
+        this.initX = this.scene.sys.game.config.width - 100;
         this.initY = 100;
+        this.attackFreq = 800;
     }
 
     preload ()
@@ -33,7 +34,7 @@ class Bird extends Phaser.GameObjects.Sprite
 
     attack(player)
     {
-        if (Phaser.Math.Between(0, 800) == 1 && this.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO)) {
+        if (Phaser.Math.Between(0, this.attackFreq) == 1 && this.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO)) {
             this.scene.physics.moveToObject(this.sprite, player, 200);
         }
     }
@@ -53,6 +54,10 @@ class Bird extends Phaser.GameObjects.Sprite
             this.sprite.body.velocity.x > 0){
             this.sprite.body.setVelocity(0);
         }
+
+        if (this.sprite.body.checkWorldBounds()) {
+            this.scene.physics.moveTo(this.sprite, this.initX, this.initY, 200);
+        }
     }
 }
 
@@ -63,6 +68,8 @@ class Box extends Phaser.GameObjects.Sprite
         super(scene, x, y);
         this.scene = scene;
         this.sprite = 0;
+        this.initX = this.scene.sys.game.config.width - 100;
+        this.initY = this.scene.sys.game.config.height - 100;
     }
 
     preload ()
@@ -72,7 +79,7 @@ class Box extends Phaser.GameObjects.Sprite
 
     create ()
     {
-        this.sprite = this.scene.physics.add.sprite(750, 100, 'box');
+        this.sprite = this.scene.physics.add.sprite(this.initX, this.initY, 'box');
         this.sprite.setScale(1.5);
         this.sprite.body.setSize(this.sprite.width, this.sprite.height);
         this.sprite.body.setOffset(0, -5);
@@ -105,8 +112,12 @@ class Ground extends Phaser.GameObjects.Sprite
         this.sprite = this.scene.add.tileSprite(this.scene.sys.game.config.width/2, this.scene.sys.game.config.height, 0, 0, 'ground');
         this.scene.physics.add.existing(this.sprite, false);
         this.sprite.body.setCollideWorldBounds(true);
-        this.sprite.body.setSize(this.scene.sys.game.config.width, this.sprite.height-13);
+        this.sprite.body.setSize(this.scene.sys.game.config.width, this.sprite.height);
+        this.sprite.setSize(this.scene.sys.game.config.width, this.sprite.height);
+        //this.sprite.setOrigin(this.scene.sys.game.config.width/2, this.scene.sys.game.config.height);
         this.sprite.body.setOffset(0, 13);
+        //this.sprite.setScale(2);
+
     }
 }
 

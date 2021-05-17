@@ -16,7 +16,7 @@ class Game extends Phaser.Scene
         this.state = 0;
         this.scoreText = 0;
         this.score = 0;
-        this.speed = 3;
+        this.speed = 5;
     }
 
     preload ()
@@ -76,6 +76,10 @@ class Game extends Phaser.Scene
             a.scene.state.sprite.setFrame(1);
         });
 
+        this.input.on('pointerdown', function () {
+            this.scene.player.jump();
+        });
+
         cursors = this.input.keyboard.createCursorKeys();
         this.scoreText = this.add.text(16, 3, 'Score: 0', { fontSize: '30px', fill: '#000' });
 
@@ -103,8 +107,8 @@ class Game extends Phaser.Scene
         this.ground.sprite.tilePositionX += this.speed;
         this.box.sprite.x += - this.speed;
 
-        if (cursors.up.isDown && this.player.sprite.body.touching.down) {
-            this.player.sprite.setVelocityY(-500);
+        if (cursors.up.isDown) {
+            this.player.jump();
         }
 
         this.player.update();
@@ -112,8 +116,8 @@ class Game extends Phaser.Scene
         if (this.box.sprite.x + this.box.sprite.width <= -1) {
              this.score = this.score + 1;
             this.scoreText.setText('Score: ' + this.score);
-            this.box.sprite.x = this.sys.game.config.width - this.box.sprite.width;
-            this.box.sprite.y = 300;
+            this.box.sprite.x = this.box.initX;
+            this.box.sprite.y = this.box.initY;
         }
 
     }
@@ -128,22 +132,8 @@ class Preloader extends Phaser.Scene {
 
     create ()
     {
-        //this.facebook.showLoadProgress(this);
         this.facebook.once('startgame', this.startGame, this);
         this.facebook.gameStarted();
-
-        /*this.scene.load.spritesheet('box', 'assets/box.png', { frameWidth: 37, frameHeight: 41 });
-        this.scene.load.image('ground', 'assets/ground2.png');
-        this.scene.load.spritesheet('sound', 'assets/sound.png', { frameWidth: 50, frameHeight: 50 });
-        this.scene.load.audio('eye_music', 'assets/skoad_music.mp3');
-        this.scene.load.spritesheet('state', 'assets/state.png', { frameWidth: 50, frameHeight: 50 });
-        this.scene.load.spritesheet('bird', 'assets/bird.png', { frameWidth: 25, frameHeight: 25 });
-        this.load.image('background', 'assets/mont_saint_michel.png');*/
-        /*FBInstant.setLoadingProgress(100);
-        FBInstant.startGameAsync().then(function() {
-          this.startGame();
-        });*/
-
     }
 
     startGame ()

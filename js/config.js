@@ -6,8 +6,8 @@ FBInstant.initializeAsync().then(function() {
 
         var config = {
             type: Phaser.AUTO,
-            width: 800,//window.innerWidth,
-            height: 400, //window.innerHeight,
+            width: window.innerWidth, // 800,
+            height: window.innerHeight, // 400,
             physics: {
                 default: 'arcade',
                 arcade: {

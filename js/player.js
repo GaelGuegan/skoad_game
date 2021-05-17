@@ -29,6 +29,13 @@ class Player extends Phaser.GameObjects.Sprite
         this.sprite.clearTint();
     }
 
+    jump()
+    {
+        if (this.sprite.body.touching.down) {
+            this.sprite.setVelocityY(-500);
+        }
+    }
+
     removeLife()
     {
         if (this.life > 0) {

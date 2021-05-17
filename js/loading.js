@@ -1,12 +1,11 @@
 function loading(scene, loadingText)
 {
+    width = scene.cameras.main.width;
+    height = scene.cameras.main.height;
     progressBar = scene.add.graphics();
     progressBox = scene.add.graphics();
     progressBox.fillStyle(0x99e550, 0.8);
-    progressBox.fillRect(240, 270, 320, 50);
-
-    width = scene.cameras.main.width;
-    height = scene.cameras.main.height;
+    progressBox.fillRect(width / 2 - 160, height / 2 + 75, 320, 50);
 
     titleText = scene.make.text({
         x: width / 2,
@@ -57,7 +56,7 @@ function loading(scene, loadingText)
         percentText.setText(parseInt(value * 100) + '%');
         progressBar.clear();
         progressBar.fillStyle(0x99e550, 1);
-        progressBar.fillRect(250, 280, 300 * value, 30);
+        progressBar.fillRect(width / 2 + 10 - 160, height / 2 + 75 + 10, 300 * value, 30);
     });
 
     scene.load.on('complete', function () {
