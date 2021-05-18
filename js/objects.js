@@ -62,19 +62,25 @@ class Bird extends Phaser.GameObjects.Sprite
         }
 
         /* BIRD GOING BACK */
-        if (this.sprite.x == 0) {
-            this.scene.physics.moveTo(this.sprite, this.initX, this.initY, 200);
+        if (this.sprite.body.checkWorldBounds()) {
+            //this.scene.physics.moveTo(this.sprite, this.initX, this.initY, 200);
+            this.sprite.x = this.initX;
+            this.sprite.y = this.initY;
         }
     }
 }
 
 class Box extends Phaser.GameObjects.Sprite
 {
+    static NORMAL = 0;
+    static FLYING = 1;
+
     constructor (scene, x, y)
     {
         super(scene, x, y);
         this.scene = scene;
         this.sprite = 0;
+        this.state = Box.NORMAL;
     }
 
     preload ()

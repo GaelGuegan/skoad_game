@@ -45,9 +45,14 @@ class Game extends Phaser.Scene
 
     boxPlayerCollisionCallback(_box, _player)
     {
-        this.player.removeLife();
-        this.box.sprite.x = config.width - this.box.sprite.width;
-        this.box.sprite.y = 300;
+        if (this.player.state == Player.MOB) {
+            this.box.state = Box.FLYING;
+            this.box.sprite.body.setVelocity(520, -720);
+        } else {
+            this.player.removeLife();
+            this.box.sprite.x = config.width - this.box.sprite.width;
+            this.box.sprite.y = 300;
+        }
     }
 
     create ()
@@ -85,12 +90,17 @@ class Game extends Phaser.Scene
         this.physics.add.collider(this.box.sprite, this.ground.sprite);
     }
 
+    gameover()
+    {
+        this.music.music.pause();
+        this.scene.pause();
+        this.scene.launch('gameover');
+    }
+
     update ()
     {
         if (this.player.life == 0) {
-            this.music.music.pause();
-            this.scene.pause();
-            this.scene.launch('gameover');
+            this.gameover();
         }
 
         this.physics.collide(this.box.sprite, this.player.sprite, this.boxPlayerCollisionCallback, 0, this);
@@ -101,20 +111,16 @@ class Game extends Phaser.Scene
         this.bird.shit(this.player.sprite);
 
         this.ground.sprite.tilePositionX += this.speed;
-        this.box.sprite.x += - this.speed;
 
-        if (cursors.up.isDown && this.player.sprite.body.touching.down) {
-            this.player.sprite.setVelocityY(-500);
+        if (this.box.state == Box.NORMAL) {
+            this.box.sprite.x += - this.speed;
         }
 
-        if (cursors.space.isDown ) {//&& this.player.sprite.body.touching.down) {
-            this.player.sprite.anims.play('squat', true);
-        }
 
         this.player.update();
 
         if (this.box.sprite.x + this.box.sprite.width <= -1) {
-             this.score = this.score + 1;
+            this.score = this.score + 1;
             this.scoreText.setText('Score: ' + this.score);
             this.box.sprite.x = config.width - this.box.sprite.width;
             this.box.sprite.y = 300;
