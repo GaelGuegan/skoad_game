@@ -15,6 +15,7 @@ class Game extends Phaser.Scene
         this.score = 0;
         this.speed = 3;
         this.cursors = 0;
+        this.mob = 0;
     }
 
     preload ()
@@ -26,6 +27,7 @@ class Game extends Phaser.Scene
         this.ground = new Ground(this, 10, 10); 
         this.music = new Music(this, 10, 10); 
         this.state = new State(this, 10, 10);
+        this.mob = new Mob(this, 10, 10);
 
         this.player.preload();
         this.bird.preload();
@@ -33,14 +35,22 @@ class Game extends Phaser.Scene
         this.ground.preload();
         this.music.preload();
         this.state.preload();
+        this.mob.preload();
 
         this.load.image('background', 'assets/mont_saint_michel.png');
     }
 
-    birdPlayerCollisionCallback(_bird, player)
+    birdPlayerCollisionCallback(_bird, _player)
     {
         this.physics.moveTo(_bird, 650, 100, 200);
         this.player.removeLife();
+    }
+
+    shitPlayerCollisionCallback(_shit, _player)
+    {
+        this.physics.moveTo(this.bird.sprite, this.bird.initX, this.bird.initY, 200);
+        this.player.removeLife();
+        this.bird.shit.destroy();
     }
 
     boxPlayerCollisionCallback(_box, _player)
@@ -53,6 +63,13 @@ class Game extends Phaser.Scene
             this.box.sprite.x = config.width - this.box.sprite.width;
             this.box.sprite.y = 300;
         }
+    }
+
+    mobPlayerCollisionCallback(_mob, _player)
+    {
+        this.mob.sprite.destroy();
+        this.mob.sprite = 0;
+        this.player.mob();
     }
 
     create ()
@@ -105,26 +122,16 @@ class Game extends Phaser.Scene
 
         this.physics.collide(this.box.sprite, this.player.sprite, this.boxPlayerCollisionCallback, 0, this);
         this.physics.collide(this.bird.sprite, this.player.sprite, this.birdPlayerCollisionCallback, 0, this);
+        this.physics.collide(this.bird.shit, this.player.sprite, this.shitPlayerCollisionCallback, 0, this);
+        this.physics.collide(this.mob.sprite, this.player.sprite, this.mobPlayerCollisionCallback, 0, this);
         //this.physics.collide(this.bird.sprite, this.player.sprite, this.bird.playerCollisionCallback, 0, this);
         this.bird.update();
         this.bird.attack(this.player.sprite);
-        this.bird.shit(this.player.sprite);
+        this.bird.shits(this.player.sprite);
 
-        this.ground.sprite.tilePositionX += this.speed;
-
-        if (this.box.state == Box.NORMAL) {
-            this.box.sprite.x += - this.speed;
-        }
-
-
+        this.ground.update();
+        this.box.update();
         this.player.update();
-
-        if (this.box.sprite.x + this.box.sprite.width <= -1) {
-            this.score = this.score + 1;
-            this.scoreText.setText('Score: ' + this.score);
-            this.box.sprite.x = config.width - this.box.sprite.width;
-            this.box.sprite.y = 300;
-        }
-
+        this.mob.update();
     }
 }

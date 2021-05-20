@@ -1,6 +1,8 @@
 class Bird extends Phaser.GameObjects.Sprite
 {
     static NORMAL = 0;
+    static ATTACKING = 1;
+    static SHITTING = 2;
 
     constructor (scene, x, y)
     {
@@ -9,11 +11,16 @@ class Bird extends Phaser.GameObjects.Sprite
         this.sprite = 0;
         this.initX = 650;
         this.initY = 100;
+        this.shit = 0;
+        this.state = Bird.NORMAL;
+        this.attackFreq = 800;
+        this.shitFreq = 500;
     }
 
     preload ()
     {
         this.scene.load.spritesheet('bird', 'assets/bird.png', { frameWidth: 25, frameHeight: 25 });
+        this.scene.load.spritesheet('shit', 'assets/shit.png', { frameWidth: 5, frameHeight: 10 });
     }
 
     create ()
@@ -33,15 +40,25 @@ class Bird extends Phaser.GameObjects.Sprite
 
     attack(player)
     {
-        if (Phaser.Math.Between(0, 800) == 1 && this.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO)) {
+        if (Phaser.Math.Between(0, this.attackFreq) == 1 && this.state == Bird.NORMAL) {
             this.scene.physics.moveToObject(this.sprite, player, 200);
+            this.state = Bird.ATTACKING;
         }
     }
 
-    shit(player)
+    shits(player)
     {
-        if (Phaser.Math.Between(0, 800) == 1 && this.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO)) {
-            this.scene.physics.moveTo(this.sprite, player.x, player.y - 50, 200);
+        if (Phaser.Math.Between(0, this.shitFreq) == 1 && this.state == Bird.NORMAL) {
+            this.scene.physics.moveTo(this.sprite, player.x, player.y - 200, 200);
+            this.state = Bird.SHITTING;
+        }
+
+        if (this.state == Bird.SHITTING) {
+            if (this.sprite.body.x <= player.body.x + 50) {
+                this.shit = this.scene.physics.add.sprite(this.sprite.body.x, this.sprite.body.y, 'shit');
+                this.shit.setScale(3);
+                this.state = Bird.NORMAL;
+            }
         }
     }
 
@@ -59,6 +76,7 @@ class Bird extends Phaser.GameObjects.Sprite
             !this.sprite.body.velocity.equals(Phaser.Math.Vector2.ZERO) &&
             this.sprite.body.velocity.x > 0){
             this.sprite.body.setVelocity(0);
+            this.state = Bird.NORMAL;
         }
 
         /* BIRD GOING BACK */
@@ -66,6 +84,7 @@ class Bird extends Phaser.GameObjects.Sprite
             //this.scene.physics.moveTo(this.sprite, this.initX, this.initY, 200);
             this.sprite.x = this.initX;
             this.sprite.y = this.initY;
+            this.state = Bird.NORMAL;
         }
     }
 }
@@ -74,7 +93,7 @@ class Box extends Phaser.GameObjects.Sprite
 {
     static NORMAL = 0;
     static FLYING = 1;
-
+ 
     constructor (scene, x, y)
     {
         super(scene, x, y);
@@ -102,6 +121,55 @@ class Box extends Phaser.GameObjects.Sprite
         });
         this.sprite.anims.play('box', true);
     }
+
+    update()
+    {
+        if (this.state == Box.NORMAL) {
+            this.sprite.x += - this.scene.speed;
+        }
+
+        if (this.sprite.x + this.sprite.width <= -1) {
+            this.scene.score = this.scene.score + 1;
+            this.scene.scoreText.setText('Score: ' + this.scene.score);
+            this.sprite.x = config.width - this.sprite.width;
+            this.sprite.y = 300;
+        }
+    }
+}
+
+class Mob extends Phaser.GameObjects.Sprite
+{
+    constructor (scene, x, y)
+    {
+        super(scene, x, y);
+        this.scene = scene;
+        this.sprite = 0;
+        this.freq = 600;
+    }
+
+    preload ()
+    {
+        this.scene.load.spritesheet('mob', 'assets/mob.png', { frameWidth: 39, frameHeight: 24 });
+    }
+
+    create ()
+    {
+        //this.sprite = this.scene.add.tileSprite(config.width/2, config.height, 0, 0, 'ground');
+    }
+
+    update ()
+    {
+        if (Phaser.Math.Between(0, this.freq) == 1) {
+            this.sprite = this.scene.physics.add.sprite(config.width - 50, config.height - 150, 'mob');
+            this.sprite.setScale(3);
+            this.scene.physics.add.collider(this.sprite, this.scene.ground.sprite);
+        }
+
+        if( this.sprite != 0) {
+            this.sprite.body.x += - this.scene.speed;
+        }
+
+    }
 }
 
 class Ground extends Phaser.GameObjects.Sprite
@@ -125,6 +193,11 @@ class Ground extends Phaser.GameObjects.Sprite
         this.sprite.body.setCollideWorldBounds(true);
         this.sprite.body.setSize(this.sprite.width, this.sprite.height-13);
         this.sprite.body.setOffset(0, 13);
+    }
+
+    update()
+    {
+        this.sprite.tilePositionX += this.scene.speed;
     }
 }
 

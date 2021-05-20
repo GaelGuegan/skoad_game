@@ -2,7 +2,7 @@ class Player extends Phaser.GameObjects.Sprite
 {
     static RUN = 0;
     static MOB = 1;
-    static SQUAT = 1;
+    static SQUAT = 2;
 
     constructor (scene, x, y)
     {
@@ -19,7 +19,7 @@ class Player extends Phaser.GameObjects.Sprite
     {
         this.scene.load.spritesheet('dude', 'assets/skoad_man.png', { frameWidth: 28, frameHeight: 50 });
         this.scene.load.spritesheet('dude_squat', 'assets/skoad_man_squat.png', { frameWidth: 20, frameHeight: 33 });
-        this.scene.load.spritesheet('dude_mob', 'assets/mob.png', { frameWidth: 39, frameHeight: 38 });
+        this.scene.load.spritesheet('dude_mob', 'assets/skoad_man_mob.png', { frameWidth: 39, frameHeight: 38 });
         this.scene.load.image('life', 'assets/life.png');
         this.scene.load.audio('hurt', 'assets/hurt.wav');
     }
@@ -36,7 +36,7 @@ class Player extends Phaser.GameObjects.Sprite
 
     removeLife()
     {
-        if (this.life > 0 && this.state == Player.NORMAL) {
+        if (this.life > 0 && this.state == Player.RUN) {
             this.hurtSound.play();
             this.lifeImages[this.life - 1].destroy();
             this.life = this.life - 1;
@@ -124,6 +124,7 @@ class Player extends Phaser.GameObjects.Sprite
     squat()
     {
         if (this.sprite.body.touching.down) {
+            this.state = Player.SQUAT;
             this.sprite.body.setSize(20, 33);
             this.sprite.setOrigin(0.5, 0.5);
             this.sprite.setScale(2);
