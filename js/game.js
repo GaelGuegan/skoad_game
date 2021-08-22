@@ -65,11 +65,17 @@ class Game extends Phaser.Scene
         }
     }
 
+    boxBirdCollisionCallback(_box, _bird)
+    {
+        this.box.state = Box.NORMAL;
+    }
+
     mobPlayerCollisionCallback(_mob, _player)
     {
         this.mob.sprite.destroy();
         this.mob.sprite = 0;
         this.player.mob();
+        this.player.mobTimeout = this.time.delayedCall(6000, this.player.run, [], this.player);
     }
 
     create ()
@@ -105,6 +111,7 @@ class Game extends Phaser.Scene
         /*************/
         this.physics.add.collider(this.player.sprite, this.ground.sprite);
         this.physics.add.collider(this.box.sprite, this.ground.sprite);
+        this.physics.add.collider(this.box.sprite, this.bird.sprite);
     }
 
     gameover()
@@ -124,6 +131,7 @@ class Game extends Phaser.Scene
         this.physics.collide(this.bird.sprite, this.player.sprite, this.birdPlayerCollisionCallback, 0, this);
         this.physics.collide(this.bird.shit, this.player.sprite, this.shitPlayerCollisionCallback, 0, this);
         this.physics.collide(this.mob.sprite, this.player.sprite, this.mobPlayerCollisionCallback, 0, this);
+        this.physics.collide(this.box.sprite, this.bird.sprite, this.boxBirdCollisionCallback, 0, this);
         //this.physics.collide(this.bird.sprite, this.player.sprite, this.bird.playerCollisionCallback, 0, this);
         this.bird.update();
         this.bird.attack(this.player.sprite);

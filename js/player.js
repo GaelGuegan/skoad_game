@@ -12,7 +12,8 @@ class Player extends Phaser.GameObjects.Sprite
         this.life = 3;
         this.lifeImages = [];
         this.hurtSound = 0;
-        this.state = Player.NORMAL;
+        this.state = Player.RUN;
+        this.mobTimeout = 0;
     }
 
     preload ()
@@ -36,19 +37,12 @@ class Player extends Phaser.GameObjects.Sprite
 
     removeLife()
     {
-        if (this.life > 0 && this.state == Player.RUN) {
+        if (this.life > 0 && this.state != Player.MOB ) {
             this.hurtSound.play();
             this.lifeImages[this.life - 1].destroy();
             this.life = this.life - 1;
             this.sprite.setTint(0xff0000);
             this.scene.time.delayedCall(800, this.clearPlayerTint, [], this);
-        }
-    }
-
-    jump()
-    {
-        if (this.sprite.body.touching.down) {
-            this.sprite.setVelocityY(-500);
         }
     }
 
@@ -67,16 +61,25 @@ class Player extends Phaser.GameObjects.Sprite
         }
 
         this.scene.input.on('pointerdown', function () {
-            this.scene.player.jump();
+            if (this.scene.player.state == Player.RUN) {
+                this.scene.player.jump();
+            }
+        });
+        this.scene.input.keyboard.on('keyup-DOWN', function () {
+            this.scene.player.sprite.y = this.scene.player.sprite.y - 50;
+            this.state = Player.RUN;
         });
         this.scene.input.keyboard.on('keyup-SPACE', function () {
             this.scene.player.sprite.y = this.scene.player.sprite.y - 50;
+            this.state = Player.RUN;
         });
         this.scene.input.keyboard.on('keyup-SHIFT', function () {
             this.scene.player.sprite.y = this.scene.player.sprite.y - 50;
+            this.state = Player.RUN;
         });
         this.scene.input.keyboard.on('keydown-SHIFT', function () {
             this.scene.player.sprite.y = this.scene.player.sprite.y - 50;
+            this.state = Player.MOB;
         });
 
         this.scene.anims.create({
@@ -121,6 +124,15 @@ class Player extends Phaser.GameObjects.Sprite
         this.sprite.anims.play('right', true);
     }
 
+    jump()
+    {
+        if (this.state != Player.MOB) {
+            if (this.sprite.body.touching.down) {
+                this.sprite.setVelocityY(-500);
+            }
+        }
+    }
+
     squat()
     {
         if (this.sprite.body.touching.down) {
@@ -144,18 +156,18 @@ class Player extends Phaser.GameObjects.Sprite
 
     run()
     {
-        if (this.sprite.body.touching.down) {
+        //if (this.sprite.body.touching.down) {
             this.state = Player.RUN;
             this.sprite.body.setSize(28, 50);
             this.sprite.setScale(2);
             this.sprite.anims.play('right', true);
-        }
+        //}
     }
 
     update()
     {
 
-        if (!this.sprite.body.touching.down && !this.scene.cursors.space.isDown && !this.scene.cursors.shift.isDown) {
+        if (!this.sprite.body.touching.down && !this.scene.cursors.down.isDown && !this.scene.cursors.shift.isDown) {
             if (this.sprite.body.velocity.y < 200 && this.sprite.body.velocity.y > -100) {
                 this.sprite.body.setSize(28, 50);
                 this.sprite.setScale(2);
@@ -168,11 +180,11 @@ class Player extends Phaser.GameObjects.Sprite
         } else {
             if (this.scene.cursors.up.isDown) {
                 this.jump();
-            } else if (this.scene.cursors.space.isDown ) {
+            } else if (this.scene.cursors.down.isDown ) {
                 this.squat();
-            } else if (this.scene.cursors.shift.isDown ) {
+            } else if (this.scene.cursors.shift.isDown || this.state == Player.MOB) {
                 this.mob();
-            } else {
+            } else {//} if (this.state == Player.RUN) {
                 this.run();
             }
         }

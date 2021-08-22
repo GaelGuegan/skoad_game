@@ -124,8 +124,13 @@ class Box extends Phaser.GameObjects.Sprite
 
     update()
     {
+
         if (this.state == Box.NORMAL) {
             this.sprite.x += - this.scene.speed;
+        }
+
+        if (this.state == Box.FLYING && this.sprite.y > this.scene.ground.sprite.y-50) {
+            this.state = Box.NORMAL;
         }
 
         if (this.sprite.x + this.sprite.width <= -1) {
@@ -133,6 +138,14 @@ class Box extends Phaser.GameObjects.Sprite
             this.scene.scoreText.setText('Score: ' + this.scene.score);
             this.sprite.x = config.width - this.sprite.width;
             this.sprite.y = 300;
+            this.sprite.body.setVelocity(0, 0);
+        }
+
+        if (this.sprite.x > config.width + 50) {
+            this.sprite.x = config.width - this.sprite.width;
+            this.sprite.y = 300;
+            this.state = Box.NORMAL;
+            this.sprite.body.setVelocity(0, 0);
         }
     }
 }
@@ -154,15 +167,15 @@ class Mob extends Phaser.GameObjects.Sprite
 
     create ()
     {
-        //this.sprite = this.scene.add.tileSprite(config.width/2, config.height, 0, 0, 'ground');
+        this.sprite = this.scene.physics.add.sprite(config.width - 50, config.height - 150, 'mob');
+        this.sprite.setScale(3);
+        this.scene.physics.add.collider(this.sprite, this.scene.ground.sprite);
     }
 
     update ()
     {
-        if (Phaser.Math.Between(0, this.freq) == 1) {
-            this.sprite = this.scene.physics.add.sprite(config.width - 50, config.height - 150, 'mob');
-            this.sprite.setScale(3);
-            this.scene.physics.add.collider(this.sprite, this.scene.ground.sprite);
+        if (Phaser.Math.Between(0, this.freq) == 1 && this.scene.player.state != 1 && this.sprite == 0) {
+            this.create();
         }
 
         if( this.sprite != 0) {
