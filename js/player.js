@@ -3,6 +3,7 @@ class Player extends Phaser.GameObjects.Sprite
     static RUN = 0;
     static MOB = 1;
     static SQUAT = 2;
+    static BORAT = 3;
 
     constructor (scene, x, y)
     {
@@ -14,6 +15,8 @@ class Player extends Phaser.GameObjects.Sprite
         this.hurtSound = 0;
         this.state = Player.RUN;
         this.mobTimeout = 0;
+        this.currentScale = 2;
+        this.boratTimeout = 0;
     }
 
     preload ()
@@ -21,8 +24,61 @@ class Player extends Phaser.GameObjects.Sprite
         this.scene.load.spritesheet('dude', 'assets/skoad_man.png', { frameWidth: 28, frameHeight: 50 });
         this.scene.load.spritesheet('dude_squat', 'assets/skoad_man_squat.png', { frameWidth: 20, frameHeight: 33 });
         this.scene.load.spritesheet('dude_mob', 'assets/skoad_man_mob.png', { frameWidth: 39, frameHeight: 38 });
+        this.scene.load.spritesheet('dude_borat', 'assets/borat.png', { frameWidth: 82, frameHeight: 152 });
         this.scene.load.image('life', 'assets/life.png');
         this.scene.load.audio('hurt', 'assets/hurt.wav');
+    }
+
+    createAnimations()
+    {
+        this.scene.anims.create({
+            key: 'left',
+            frames: this.scene.anims.generateFrameNumbers('dude', { start: 0, end: 4 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.scene.anims.create({
+            key: 'idle_left',
+            frames: [ { key: 'dude', frame: 5 } ],
+        });
+        this.scene.anims.create({
+            key: 'idle_right',
+            frames: [ { key: 'dude', frame: 6 } ],
+        });
+        this.scene.anims.create({
+            key: 'right',
+            frames: this.scene.anims.generateFrameNumbers('dude', { start: 9, end: 13 }),
+            frameRate: 8,
+            repeat: -1
+        });
+        this.scene.anims.create({
+            key: 'jump_right',
+            frames: [ { key: 'dude', frame: 6 } ],
+        });
+        this.scene.anims.create({
+            key: 'jump_up',
+            frames: [ { key: 'dude', frame: 7 } ],
+        });
+        this.scene.anims.create({
+            key: 'jump_borat',
+            frames: [ { key: 'dude_borat', frame: 3 } ],
+        });
+        this.scene.anims.create({
+            key: 'squat',
+            frames: [ { key: 'dude_squat'} ],
+        });
+        this.scene.anims.create({
+            key: 'mob',
+            frames: this.scene.anims.generateFrameNumbers('dude_mob', { start: 0, end: 7 }),
+            frameRate: 8,
+            repeat: -1
+        });
+        this.scene.anims.create({
+            key: 'borat',
+            frames: this.scene.anims.generateFrameNumbers('dude_borat', { start: 4, end: 7}),
+            frameRate: 8,
+            repeat: -1
+        });
     }
 
     playerBoxCollisionCallback(box, player)
@@ -33,6 +89,20 @@ class Player extends Phaser.GameObjects.Sprite
     clearPlayerTint()
     {
         this.sprite.clearTint();
+    }
+
+    setScale(newScale, bodyWidth = 0, bodyHeight = 0)
+    {
+        if (this.currentScale !== newScale) {
+            this.sprite.setScale(newScale);
+            this.currentScale = newScale;
+        }
+        if (bodyWidth === 0 && bodyHeight === 0) {
+            this.sprite.body.setSize(this.sprite.displayWidth, this.sprite.displayHeight);
+        }
+        if (this.sprite.body.width !== bodyWidth || this.sprite.body.height !== bodyHeight) {
+            this.sprite.body.setSize(bodyWidth, bodyHeight);
+        }  
     }
 
     removeLife()
@@ -82,44 +152,7 @@ class Player extends Phaser.GameObjects.Sprite
             this.state = Player.MOB;
         });
 
-        this.scene.anims.create({
-            key: 'left',
-            frames: this.scene.anims.generateFrameNumbers('dude', { start: 0, end: 4 }),
-            frameRate: 10,
-            repeat: -1
-        });
-        this.scene.anims.create({
-            key: 'idle_left',
-            frames: [ { key: 'dude', frame: 5 } ],
-        });
-        this.scene.anims.create({
-            key: 'idle_right',
-            frames: [ { key: 'dude', frame: 6 } ],
-        });
-        this.scene.anims.create({
-            key: 'right',
-            frames: this.scene.anims.generateFrameNumbers('dude', { start: 9, end: 13 }),
-            frameRate: 8,
-            repeat: -1
-        });
-        this.scene.anims.create({
-            key: 'jump_right',
-            frames: [ { key: 'dude', frame: 6 } ],
-        });
-        this.scene.anims.create({
-            key: 'jump_up',
-            frames: [ { key: 'dude', frame: 7 } ],
-        });
-        this.scene.anims.create({
-            key: 'squat',
-            frames: [ { key: 'dude_squat'} ],
-        });
-        this.scene.anims.create({
-            key: 'mob',
-            frames: this.scene.anims.generateFrameNumbers('dude_mob', { start: 0, end: 7 }),
-            frameRate: 8,
-            repeat: -1
-        });
+        this.createAnimations();
 
         this.sprite.anims.play('right', true);
     }
@@ -129,6 +162,7 @@ class Player extends Phaser.GameObjects.Sprite
         if (this.state != Player.MOB) {
             if (this.sprite.body.touching.down) {
                 this.sprite.setVelocityY(-500);
+                this.setScale(0.5, 28, 50);
             }
         }
     }
@@ -137,54 +171,78 @@ class Player extends Phaser.GameObjects.Sprite
     {
         if (this.sprite.body.touching.down) {
             this.state = Player.SQUAT;
-            this.sprite.body.setSize(20, 33);
             this.sprite.setOrigin(0.5, 0.5);
-            this.sprite.setScale(2);
+            this.setScale(2, 20, 33);
             this.sprite.anims.play('squat', true);
         }
     }
 
+    boratTimeoutCallback()
+    {
+        this.state = Player.RUN;
+    }
+
     mob()
     {
-        //if (this.sprite.body.touching.down) {
             this.state = Player.MOB;
             this.sprite.body.setSize(39, 38, false);
-            this.sprite.setScale(2.7);
+            this.setScale(2.7, 39, 38);
             this.sprite.anims.play('mob', true);
-        //}
+    }
+
+    borat()
+    {
+        this.state = Player.BORAT;
+        this.boratTimeout = this.scene.time.delayedCall(6000, this.boratTimeoutCallback, [], this);
+
     }
 
     run()
     {
-        //if (this.sprite.body.touching.down) {
+        if (this.state == Player.BORAT) {
+            this.setScale(0.7);
+            this.sprite.anims.play('borat', true);
+        } else {
             this.state = Player.RUN;
-            this.sprite.body.setSize(28, 50);
-            this.sprite.setScale(2);
+            this.setScale(2, 28, 50);
             this.sprite.anims.play('right', true);
-        //}
+        }
+    }
+
+    jumping()
+    {
+        if (this.state == Player.BORAT) {
+                this.setScale(0.7);
+                this.sprite.anims.play('jump_borat', true);
+                return;
+        }
+
+        if (this.sprite.body.velocity.y < 200 && this.sprite.body.velocity.y > -100) {
+            this.setScale(2, 28, 50);
+            this.sprite.anims.play('jump_up', true);
+        } else {
+            this.setScale(2, 28, 50);
+            this.sprite.anims.play('jump_right', true);
+        }
     }
 
     update()
     {
-
-        if (!this.sprite.body.touching.down && !this.scene.cursors.down.isDown && !this.scene.cursors.shift.isDown) {
-            if (this.sprite.body.velocity.y < 200 && this.sprite.body.velocity.y > -100) {
-                this.sprite.body.setSize(28, 50);
-                this.sprite.setScale(2);
-                this.sprite.anims.play('jump_up', true);
-            } else {
-                this.sprite.body.setSize(28, 50);
-                this.sprite.setScale(2);
-                this.sprite.anims.play('jump_right', true);
-            }
+        if (!this.sprite.body.touching.down &&
+            !this.scene.cursors.down.isDown &&
+            !this.scene.cursors.shift.isDown) {
+            this.jumping();
         } else {
             if (this.scene.cursors.up.isDown) {
                 this.jump();
             } else if (this.scene.cursors.down.isDown ) {
                 this.squat();
-            } else if (this.scene.cursors.shift.isDown || this.state == Player.MOB) {
+            } else if (this.scene.cursors.shift.isDown ) {
                 this.mob();
-            } else {//} if (this.state == Player.RUN) {
+            } else if (this.scene.cursors.right.isDown) {
+                this.state = Player.BORAT;
+                this.boratTimeout = this.scene.time.delayedCall(6000, this.boratTimeoutCallback, [], this);
+            } else {
                 this.run();
             }
         }

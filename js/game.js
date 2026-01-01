@@ -16,6 +16,7 @@ class Game extends Phaser.Scene
         this.speed = 3;
         this.cursors = 0;
         this.mob = 0;
+        this.slip = 0;
     }
 
     preload ()
@@ -28,6 +29,7 @@ class Game extends Phaser.Scene
         this.music = new Music(this, 10, 10); 
         this.state = new State(this, 10, 10);
         this.mob = new Mob(this, 10, 10);
+        this.slip = new Slip(this, 10, 10);
 
         this.player.preload();
         this.bird.preload();
@@ -36,6 +38,7 @@ class Game extends Phaser.Scene
         this.music.preload();
         this.state.preload();
         this.mob.preload();
+        this.slip.preload();
 
         this.load.image('background', 'assets/mont_saint_michel.png');
     }
@@ -78,6 +81,13 @@ class Game extends Phaser.Scene
         this.player.mobTimeout = this.time.delayedCall(6000, this.player.run, [], this.player);
     }
 
+    slipPlayerCollisionCallback(_slip, _player)
+    {
+        this.slip.sprite.destroy();
+        this.slip.sprite = 0;
+        this.player.borat();
+    }
+
     create ()
     {
         /**************/
@@ -94,7 +104,8 @@ class Game extends Phaser.Scene
         this.ground.create();
         this.player.create();
         this.bird.create();
-        this.box.create();
+        //this.box.create();
+        this.slip.create();
         this.music.create();
         this.state.create();
 
@@ -132,13 +143,14 @@ class Game extends Phaser.Scene
         this.physics.collide(this.bird.shit, this.player.sprite, this.shitPlayerCollisionCallback, 0, this);
         this.physics.collide(this.mob.sprite, this.player.sprite, this.mobPlayerCollisionCallback, 0, this);
         this.physics.collide(this.box.sprite, this.bird.sprite, this.boxBirdCollisionCallback, 0, this);
-        //this.physics.collide(this.bird.sprite, this.player.sprite, this.bird.playerCollisionCallback, 0, this);
+        this.physics.collide(this.slip.sprite, this.player.sprite, this.slipPlayerCollisionCallback, 0, this);
         this.bird.update();
         this.bird.attack(this.player.sprite);
         this.bird.shits(this.player.sprite);
 
         this.ground.update();
-        this.box.update();
+        //this.box.update();
+        this.slip.update();
         this.player.update();
         this.mob.update();
     }

@@ -112,7 +112,6 @@ class Box extends Phaser.GameObjects.Sprite
         this.sprite = this.scene.physics.add.sprite(750, 100, 'box');
         this.sprite.setScale(1.5);
         this.sprite.body.setSize(this.sprite.width, this.sprite.height);
-        this.sprite.body.setOffset(0, -5);
         this.scene.anims.create({
             key: 'box',
             frames: this.scene.anims.generateFrameNumbers('box', { start: 0, end: 3 }),
@@ -169,6 +168,40 @@ class Mob extends Phaser.GameObjects.Sprite
     {
         this.sprite = this.scene.physics.add.sprite(config.width - 50, config.height - 150, 'mob');
         this.sprite.setScale(3);
+        this.scene.physics.add.collider(this.sprite, this.scene.ground.sprite);
+    }
+
+    update ()
+    {
+        if (Phaser.Math.Between(0, this.freq) == 1 && this.scene.player.state != 1 && this.sprite == 0) {
+            this.create();
+        }
+
+        if( this.sprite != 0) {
+            this.sprite.body.x += - this.scene.speed;
+        }
+
+    }
+}
+
+class Slip extends Phaser.GameObjects.Sprite
+{
+    constructor (scene, x, y)
+    {
+        super(scene, x, y);
+        this.scene = scene;
+        this.sprite = 0;
+    }
+
+    preload ()
+    {
+        this.scene.load.spritesheet('slip', 'assets/slip.png', { frameWidth: 133, frameHeight: 261 });
+    }
+
+    create ()
+    {
+        this.sprite = this.scene.physics.add.sprite(config.width - 50, config.height - 150, 'slip');
+        //this.sprite.setScale(3);
         this.scene.physics.add.collider(this.sprite, this.scene.ground.sprite);
     }
 
