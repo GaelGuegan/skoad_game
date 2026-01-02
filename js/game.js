@@ -63,7 +63,7 @@ class Game extends Phaser.Scene
             this.box.sprite.body.setVelocity(520, -720);
         } else {
             this.player.removeLife();
-            this.box.sprite.x = config.width - this.box.sprite.width;
+            this.box.sprite.x = this.cameras.main.width - this.box.sprite.width;
             this.box.sprite.y = 300;
         }
     }
@@ -95,7 +95,7 @@ class Game extends Phaser.Scene
         /**************/
         background = this.add.image(0, 0, 'background');
         background.setOrigin(0, 0);
-        background.setDisplaySize(config.width, config.height-20);
+        background.setDisplaySize(this.cameras.main.width, this.cameras.main.height - 20);
 
 
         /********************/

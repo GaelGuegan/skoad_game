@@ -135,13 +135,13 @@ class Box extends Phaser.GameObjects.Sprite
         if (this.sprite.x + this.sprite.width <= -1) {
             this.scene.score = this.scene.score + 1;
             this.scene.scoreText.setText('Score: ' + this.scene.score);
-            this.sprite.x = config.width - this.sprite.width;
+            this.sprite.x = this.scene.cameras.main.width - this.sprite.width;
             this.sprite.y = 300;
             this.sprite.body.setVelocity(0, 0);
         }
 
-        if (this.sprite.x > config.width + 50) {
-            this.sprite.x = config.width - this.sprite.width;
+        if (this.sprite.x > this.scene.cameras.main.width + 50) {
+            this.sprite.x = this.scene.cameras.main.width - this.sprite.width;
             this.sprite.y = 300;
             this.state = Box.NORMAL;
             this.sprite.body.setVelocity(0, 0);
@@ -166,7 +166,7 @@ class Mob extends Phaser.GameObjects.Sprite
 
     create ()
     {
-        this.sprite = this.scene.physics.add.sprite(config.width - 50, config.height - 150, 'mob');
+        this.sprite = this.scene.physics.add.sprite(this.scene.cameras.main.width - 50, this.scene.cameras.main.height - 150, 'mob');
         this.sprite.setScale(3);
         this.scene.physics.add.collider(this.sprite, this.scene.ground.sprite);
     }
@@ -200,8 +200,8 @@ class Slip extends Phaser.GameObjects.Sprite
 
     create ()
     {
-        this.sprite = this.scene.physics.add.sprite(config.width - 50, config.height - 150, 'slip');
-        //this.sprite.setScale(3);
+        this.sprite = this.scene.physics.add.sprite(this.scene.cameras.main.width - 50, this.scene.cameras.main.height - 150, 'slip');
+        this.sprite.setScale(0.3);
         this.scene.physics.add.collider(this.sprite, this.scene.ground.sprite);
     }
 
@@ -234,7 +234,7 @@ class Ground extends Phaser.GameObjects.Sprite
 
     create ()
     {
-        this.sprite = this.scene.add.tileSprite(config.width/2, config.height, 0, 0, 'ground');
+        this.sprite = this.scene.add.tileSprite(this.scene.cameras.main.width/2, this.scene.cameras.main.height, 0, 0, 'ground');
         this.scene.physics.add.existing(this.sprite, false);
         this.sprite.body.setCollideWorldBounds(true);
         this.sprite.body.setSize(this.sprite.width, this.sprite.height-13);
@@ -268,7 +268,7 @@ class Music extends Phaser.GameObjects.Sprite
         this.music = this.scene.sound.add('eye_music');
         this.music.play({loop: true});
 
-        this.sprite = this.scene.add.sprite(config.width-50, 25, 'sound');
+        this.sprite = this.scene.add.sprite(this.scene.cameras.main.width-50, 25, 'sound');
         this.sprite.setInteractive();
         this.sprite.on('pointerdown', function (a) {
             this.scene.music.update();
@@ -303,7 +303,7 @@ class State extends Phaser.GameObjects.Sprite
 
     create ()
     {
-        this.sprite = this.scene.add.sprite(config.width-100, 25, 'state').setInteractive();
+        this.sprite = this.scene.add.sprite(this.scene.cameras.main.width-100, 25, 'state').setInteractive();
         this.sprite.setFrame(1);
         this.sprite.on('pointerdown', function () {
             this.scene.music.update();

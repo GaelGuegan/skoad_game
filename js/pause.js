@@ -17,7 +17,7 @@ class Pause extends Phaser.Scene
             this.scene.scene.resume('game');
         });
 
-        var pause = this.add.image(config.width/2, config.height/2, 'pause');
+        var pause = this.add.image(this.cameras.main.width/2, this.cameras.main.height/2, 'pause');
     }
 }
 
@@ -40,7 +40,7 @@ class GameOver extends Phaser.Scene
             this.scene.scene.start('game');
         });
 
-        var gameover = this.add.image(config.width/2, config.height/2, 'gameover');
+        var gameover = this.add.image(this.cameras.main.width/2, this.cameras.main.height/2, 'gameover');
     }
 
 }
