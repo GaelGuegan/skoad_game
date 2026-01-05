@@ -45,14 +45,26 @@ class Game extends Phaser.Scene
 
     birdPlayerCollisionCallback(_bird, _player)
     {
+        if (this.player.state == Player.STRIKE) {
+            //this.bird.destroy();
+            return;
+        }
         this.physics.moveTo(_bird, 650, 100, 200);
         this.player.removeLife();
     }
 
     shitPlayerCollisionCallback(_shit, _player)
     {
+        if (this.player.state == Player.STRIKE) {
+            this.physics.moveTo(this.bird.shit, 650, 0, 100, 1000, 1000);
+            return;
+        }
         this.physics.moveTo(this.bird.sprite, this.bird.initX, this.bird.initY, 200);
         this.player.removeLife();
+    }
+
+    shitGroundCollisionCallback(_shit, _ground)
+    {
         this.bird.shit.destroy();
     }
 
@@ -77,6 +89,7 @@ class Game extends Phaser.Scene
     {
         this.mob.sprite.destroy();
         this.mob.sprite = 0;
+        this.speed = 7;
         this.player.mob();
         this.player.mobTimeout = this.time.delayedCall(6000, this.player.run, [], this.player);
     }
@@ -104,8 +117,8 @@ class Game extends Phaser.Scene
         this.ground.create();
         this.player.create();
         this.bird.create();
-        //this.box.create();
-        this.slip.create();
+        this.box.create();
+        //this.slip.create();
         this.music.create();
         this.state.create();
 
@@ -144,12 +157,13 @@ class Game extends Phaser.Scene
         this.physics.collide(this.mob.sprite, this.player.sprite, this.mobPlayerCollisionCallback, 0, this);
         this.physics.collide(this.box.sprite, this.bird.sprite, this.boxBirdCollisionCallback, 0, this);
         this.physics.collide(this.slip.sprite, this.player.sprite, this.slipPlayerCollisionCallback, 0, this);
+        this.physics.collide(this.bird.shit, this.ground.sprite, this.shitGroundCollisionCallback, 0, this);
         this.bird.update();
         this.bird.attack(this.player.sprite);
         this.bird.shits(this.player.sprite);
 
         this.ground.update();
-        //this.box.update();
+        this.box.update();
         this.slip.update();
         this.player.update();
         this.mob.update();

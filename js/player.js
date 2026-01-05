@@ -4,6 +4,7 @@ class Player extends Phaser.GameObjects.Sprite
     static MOB = 1;
     static SQUAT = 2;
     static BORAT = 3;
+    static STRIKE = 4;
 
     constructor (scene, x, y)
     {
@@ -17,6 +18,8 @@ class Player extends Phaser.GameObjects.Sprite
         this.mobTimeout = 0;
         this.currentScale = 2;
         this.boratTimeout = 0;
+        this.strikeTimeout = 0;
+        this.strikeSound = 0;
     }
 
     preload ()
@@ -25,8 +28,10 @@ class Player extends Phaser.GameObjects.Sprite
         this.scene.load.spritesheet('dude_squat', 'assets/skoad_man_squat.png', { frameWidth: 20, frameHeight: 33 });
         this.scene.load.spritesheet('dude_mob', 'assets/skoad_man_mob.png', { frameWidth: 39, frameHeight: 38 });
         this.scene.load.spritesheet('dude_borat', 'assets/borat.png', { frameWidth: 82, frameHeight: 152 });
+        this.scene.load.spritesheet('dude_strike', 'assets/strike.png', { frameWidth: 45, frameHeight: 50 });
         this.scene.load.image('life', 'assets/life.png');
         this.scene.load.audio('hurt', 'assets/hurt.wav');
+        this.scene.load.audio('strike_s', 'assets/strike.wav');
     }
 
     createAnimations()
@@ -79,6 +84,12 @@ class Player extends Phaser.GameObjects.Sprite
             frameRate: 8,
             repeat: -1
         });
+        this.scene.anims.create({
+            key: 'strike',
+            frames: this.scene.anims.generateFrameNumbers('dude_strike', { start: 0, end: 2 }),
+            frameRate: 6,
+            repeat: -1,
+        });
     }
 
     playerBoxCollisionCallback(box, player)
@@ -120,6 +131,7 @@ class Player extends Phaser.GameObjects.Sprite
     {
         this.sprite = this.scene.physics.add.sprite(100, 100, 'dude');
         this.hurtSound = this.scene.sound.add('hurt');
+        this.strikeSound = this.scene.sound.add('strike_s');
         this.sprite.setState(this.NORMAL);
         this.sprite.setScale(2);
         this.sprite.setBounce(0);
@@ -161,8 +173,8 @@ class Player extends Phaser.GameObjects.Sprite
     {
         if (this.state != Player.MOB) {
             if (this.sprite.body.touching.down) {
-                this.sprite.setVelocityY(-500);
-                this.setScale(0.5, 28, 50);
+                this.sprite.setVelocityY(-600);
+                this.setScale(0.4, 28, 50);
             }
         }
     }
@@ -182,19 +194,30 @@ class Player extends Phaser.GameObjects.Sprite
         this.state = Player.RUN;
     }
 
+    strikeTimeoutCallback()
+    {
+        this.state = Player.RUN;
+    }
+
     mob()
     {
-            this.state = Player.MOB;
-            this.sprite.body.setSize(39, 38, false);
-            this.setScale(2.7, 39, 38);
-            this.sprite.anims.play('mob', true);
+        this.state = Player.MOB;
+        this.sprite.body.setSize(39, 38, false);
+        this.setScale(2.7, 39, 38);
+        this.sprite.anims.play('mob', true);
     }
 
     borat()
     {
         this.state = Player.BORAT;
         this.boratTimeout = this.scene.time.delayedCall(6000, this.boratTimeoutCallback, [], this);
+    }
 
+    strike()
+    {
+        this.state = Player.STRIKE;
+        this.strikeTimeout = this.scene.time.delayedCall(500, this.strikeTimeoutCallback, [], this);
+        this.strikeSound.play();
     }
 
     run()
@@ -202,8 +225,16 @@ class Player extends Phaser.GameObjects.Sprite
         if (this.state == Player.BORAT) {
             this.setScale(0.7);
             this.sprite.anims.play('borat', true);
+            this.scene.speed = 3;
+        } else if (this.state == Player.STRIKE) {
+            this.setScale(2, 45, 50);
+            this.sprite.anims.play('strike', true);
+            this.scene.speed = 3;
+        } else if (this.state == Player.MOB) {
+            return;
         } else {
             this.state = Player.RUN;
+            this.scene.speed = 3;
             this.setScale(2, 28, 50);
             this.sprite.anims.play('right', true);
         }
@@ -212,9 +243,9 @@ class Player extends Phaser.GameObjects.Sprite
     jumping()
     {
         if (this.state == Player.BORAT) {
-                this.setScale(0.7);
-                this.sprite.anims.play('jump_borat', true);
-                return;
+            this.setScale(0.7);
+            this.sprite.anims.play('jump_borat', true);
+            return;
         }
 
         if (this.sprite.body.velocity.y < 200 && this.sprite.body.velocity.y > -100) {
@@ -239,9 +270,10 @@ class Player extends Phaser.GameObjects.Sprite
                 this.squat();
             } else if (this.scene.cursors.shift.isDown ) {
                 this.mob();
+            } else if (this.scene.cursors.left.isDown) {
+                this.strike();
             } else if (this.scene.cursors.right.isDown) {
-                this.state = Player.BORAT;
-                this.boratTimeout = this.scene.time.delayedCall(6000, this.boratTimeoutCallback, [], this);
+                this.borat();
             } else {
                 this.run();
             }

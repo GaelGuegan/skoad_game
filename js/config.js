@@ -8,11 +8,9 @@ function getGameDimensions() {
     let width, height;
     
     if (screenWidth / screenHeight > aspectRatio) {
-        // Screen is wider than game aspect ratio
         height = screenHeight;
         width = height * aspectRatio;
     } else {
-        // Screen is taller than game aspect ratio
         width = screenWidth;
         height = width / aspectRatio;
     }

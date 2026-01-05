@@ -156,7 +156,7 @@ class Mob extends Phaser.GameObjects.Sprite
         super(scene, x, y);
         this.scene = scene;
         this.sprite = 0;
-        this.freq = 600;
+        this.freq = 5000;
     }
 
     preload ()
@@ -191,6 +191,7 @@ class Slip extends Phaser.GameObjects.Sprite
         super(scene, x, y);
         this.scene = scene;
         this.sprite = 0;
+        this.freq = 10000;
     }
 
     preload ()
@@ -207,7 +208,7 @@ class Slip extends Phaser.GameObjects.Sprite
 
     update ()
     {
-        if (Phaser.Math.Between(0, this.freq) == 1 && this.scene.player.state != 1 && this.sprite == 0) {
+        if (Phaser.Math.Between(0, this.freq) == 1 && this.sprite == 0) {
             this.create();
         }
 
