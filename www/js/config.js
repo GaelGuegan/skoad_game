@@ -22,16 +22,18 @@ function getGameDimensions() {
 }
 
 var dimensions = getGameDimensions();
+const BASE_WIDTH = 800;
+const BASE_HEIGHT = 400;
 
 var config = {
     type: Phaser.AUTO,
-    width: dimensions.width,
-    height: dimensions.height,
+    width: BASE_WIDTH,
+    height: BASE_HEIGHT,
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: dimensions.width,
-        height: dimensions.height
+        /*width: dimensions.width,
+        height: dimensions.height*/
     },
     physics: {
         default: 'arcade',
@@ -41,7 +43,7 @@ var config = {
         }
     },
     pixelArt: true,
-    scene: [ Game, Pause, GameOver ]
+    scene: [ Menu, Game, Pause, GameOver ]
 };
 
 // Handle window resize

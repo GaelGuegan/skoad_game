@@ -20,6 +20,7 @@ class Player extends Phaser.GameObjects.Sprite
         this.boratTimeout = 0;
         this.strikeTimeout = 0;
         this.strikeSound = 0;
+        this.mobTimeout = 0;
     }
 
     preload ()
@@ -199,12 +200,15 @@ class Player extends Phaser.GameObjects.Sprite
         this.state = Player.RUN;
     }
 
+    mobTimeoutCallback()
+    {
+        this.state = Player.RUN;
+    }
+
     mob()
     {
         this.state = Player.MOB;
-        this.sprite.body.setSize(39, 38, false);
-        this.setScale(2.7, 39, 38);
-        this.sprite.anims.play('mob', true);
+        this.mobTimeout = this.scene.time.delayedCall(6000, this.mobTimeoutCallback, [], this);
     }
 
     borat()
@@ -231,6 +235,9 @@ class Player extends Phaser.GameObjects.Sprite
             this.sprite.anims.play('strike', true);
             this.scene.speed = 3;
         } else if (this.state == Player.MOB) {
+            this.sprite.body.setSize(39, 38, false);
+            this.setScale(2.7, 39, 38);
+            this.sprite.anims.play('mob', true);
             return;
         } else {
             this.state = Player.RUN;
@@ -259,11 +266,11 @@ class Player extends Phaser.GameObjects.Sprite
 
     update()
     {
-        if (!this.sprite.body.touching.down &&
+        /*if (!this.sprite.body.touching.down &&
             !this.scene.cursors.down.isDown &&
             !this.scene.cursors.shift.isDown) {
             this.jumping();
-        } else {
+        } else {*/
             if (this.scene.cursors.up.isDown) {
                 this.jump();
             } else if (this.scene.cursors.down.isDown ) {
@@ -277,7 +284,7 @@ class Player extends Phaser.GameObjects.Sprite
             } else {
                 this.run();
             }
-        }
+        //}
 
     }
 }

@@ -156,7 +156,7 @@ class Mob extends Phaser.GameObjects.Sprite
         super(scene, x, y);
         this.scene = scene;
         this.sprite = 0;
-        this.freq = 5000;
+        this.freq = 100;
     }
 
     preload ()

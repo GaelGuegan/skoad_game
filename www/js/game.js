@@ -110,7 +110,6 @@ class Game extends Phaser.Scene
         background.setOrigin(0, 0);
         background.setDisplaySize(this.cameras.main.width, this.cameras.main.height - 20);
 
-
         /********************/
         /* OBJECTS CREATION */
         /********************/
